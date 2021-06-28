@@ -243,7 +243,7 @@
         </createIndex>
     </changeSet>
     <changeSet author="eyese (generated)" id="1624813229211-21">
-        <createIndex indexName="FK_votes_post_id" tableName="post_votes">
+        <createIndex indexName="FK_post_id" tableName="post_votes">
             <column name="post_id"/>
         </createIndex>
     </changeSet>
@@ -258,7 +258,7 @@
         </createIndex>
     </changeSet>
     <changeSet author="eyese (generated)" id="1624813229211-24">
-        <createIndex indexName="FK_votes_user_id" tableName="post_votes">
+        <createIndex indexName="FK_user_id" tableName="post_votes">
             <column name="user_id"/>
         </createIndex>
     </changeSet>
