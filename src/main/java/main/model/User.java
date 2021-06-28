@@ -1,11 +1,13 @@
 package main.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.sql.Date;
 
+@Data
 @Entity
 @Table(name="users")
 public class User {
@@ -34,6 +36,6 @@ public class User {
     @Column(name = "code")
     private String code;
 
-    @Column(name = "photo")
+    @Column(name = "photo", columnDefinition="TEXT")
     private String photo;
 }

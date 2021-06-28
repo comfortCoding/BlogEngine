@@ -1,0 +1,8 @@
+changeLogFile: 'D:/Projects/BlogEngine/src/main/resources/db/changelog/db.changelog-master.yml'
+diffChangeLogFile: 'D:/Projects/BlogEngine/src/main/resources/db/changelog/changes/db.changelog-20210628-061342227.yml'
+driver: com.mysql.cj.jdbc.Driver
+ignoreClasspathPrefix: true
+password: lolforeal
+referenceUrl: hibernate:spring:ru.usharik.liquibase.demo.persist.model?dialect=org.hibernate.dialect.MySQLDialect
+url: jdbc:mysql://127.0.0.1:3306/blogdb?createDatabaseIfNotExist=true&useUnicode=true&serverTimezone=UTC
+username: root

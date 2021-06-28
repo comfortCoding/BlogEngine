@@ -1,6 +1,8 @@
 package main.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Data;
 import main.model.enums.ModerationStatus;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -8,6 +10,7 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
+@Data
 @Entity
 @Table(name = "posts")
 public class Post {
@@ -39,16 +42,13 @@ public class Post {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "text")
+    @Column(name = "text", nullable = false, columnDefinition = "TEXT")
     private String text;
 
     @Column(name = "view_count", nullable = false)
-    private String viewCount;
+    private int viewCount;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "tag2post",
-            joinColumns = {@JoinColumn(name = "post_id")},
-            inverseJoinColumns = {@JoinColumn(name = "tag_id")}
-    )
-    private List<Tag> tagsList;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<PostComment> postCommentList;
 }

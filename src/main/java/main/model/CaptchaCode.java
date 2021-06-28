@@ -1,12 +1,15 @@
 package main.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
 
+@Data
 @Entity
+@Table(name = "captcha_codes")
 public class CaptchaCode {
     @Id
     @Column(name = "id", nullable = false)

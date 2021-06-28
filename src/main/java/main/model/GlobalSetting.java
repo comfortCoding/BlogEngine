@@ -1,7 +1,10 @@
 package main.model;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
+@Data
 @Entity
 @Table(name = "global_settings")
 public class GlobalSetting {
