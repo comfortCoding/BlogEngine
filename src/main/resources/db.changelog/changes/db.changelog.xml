@@ -1,0 +1,270 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="eyese (generated)" id="1624813229211-1">
+        <createTable tableName="captcha_codes">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="secret_code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-2">
+        <createTable tableName="global_settings">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="code" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-3">
+        <createTable tableName="post2tag">
+            <column name="tag_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="post_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-4">
+        <createTable tableName="post_comments">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="text" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id" type="INT"/>
+            <column name="post_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-5">
+        <createTable tableName="post_votes">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="is_like" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="post_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-6">
+        <createTable tableName="posts">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="is_active" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValue="NEW" name="moderation_status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="text" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="view_count" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="moderator_id" type="INT"/>
+            <column name="user_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-7">
+        <createTable tableName="tags">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-8">
+        <createTable tableName="users">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="code" type="VARCHAR(255)"/>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_moderator" type="BIT(1)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="photo" type="TEXT"/>
+            <column name="reg_time" type="date">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-9">
+        <loadData encoding="UTF-8" file="db.changelog/changes/data/captcha_codes.csv" quotchar="'" separator="," tableName="captcha_codes">
+            <column header="id" name="id" type="NUMERIC"/>
+            <column header="code" name="code" type="STRING"/>
+            <column header="secret_code" name="secret_code" type="STRING"/>
+            <column header="time" name="time" type="STRING"/>
+        </loadData>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-9">
+        <loadData encoding="UTF-8" file="db.changelog/changes/data/captcha_codes.csv" quotchar="'" separator="," tableName="captcha_codes">
+            <column header="id" name="id" type="NUMERIC"/>
+            <column header="code" name="code" type="STRING"/>
+            <column header="secret_code" name="secret_code" type="STRING"/>
+            <column header="time" name="time" type="STRING"/>
+        </loadData>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-10">
+        <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/global_settings.csv" quotchar="&quot;" separator="," tableName="global_settings">
+            <column header="id" name="id" type="NUMERIC"/>
+            <column header="code" name="code" type="STRING"/>
+            <column header="name" name="name" type="STRING"/>
+            <column header="value" name="value" type="STRING"/>
+        </loadData>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-11">
+        <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/post2tag.csv" quotchar="&quot;" separator="," tableName="post2tag">
+            <column header="tag_id" name="tag_id" type="NUMERIC"/>
+            <column header="post_id" name="post_id" type="NUMERIC"/>
+        </loadData>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-12">
+        <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/post_comments.csv" quotchar="&quot;" separator="," tableName="post_comments">
+            <column header="id" name="id" type="NUMERIC"/>
+            <column header="text" name="text" type="STRING"/>
+            <column header="time" name="time" type="STRING"/>
+            <column header="parent_id" name="parent_id" type="NUMERIC"/>
+            <column header="post_id" name="post_id" type="NUMERIC"/>
+            <column header="user_id" name="user_id" type="NUMERIC"/>
+        </loadData>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-13">
+        <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/post_votes.csv" quotchar="&quot;" separator="," tableName="post_votes">
+            <column header="id" name="id" type="NUMERIC"/>
+            <column header="is_like" name="is_like" type="BOOLEAN"/>
+            <column header="time" name="time" type="STRING"/>
+            <column header="post_id" name="post_id" type="NUMERIC"/>
+            <column header="user_id" name="user_id" type="NUMERIC"/>
+        </loadData>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-14">
+        <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/posts.csv" quotchar="&quot;" separator="," tableName="posts">
+            <column header="id" name="id" type="NUMERIC"/>
+            <column header="is_active" name="is_active" type="BOOLEAN"/>
+            <column header="moderation_status" name="moderation_status" type="STRING"/>
+            <column header="text" name="text" type="STRING"/>
+            <column header="time" name="time" type="STRING"/>
+            <column header="title" name="title" type="STRING"/>
+            <column header="view_count" name="view_count" type="NUMERIC"/>
+            <column header="moderator_id" name="moderator_id" type="skip"/>
+            <column header="user_id" name="user_id" type="NUMERIC"/>
+        </loadData>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-15">
+        <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/tags.csv" quotchar="&quot;" separator="," tableName="tags">
+            <column header="id" name="id" type="NUMERIC"/>
+            <column header="name" name="name" type="STRING"/>
+        </loadData>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-16">
+        <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/users.csv" quotchar="&quot;" separator="," tableName="users">
+            <column header="id" name="id" type="NUMERIC"/>
+            <column header="code" name="code" type="skip"/>
+            <column header="email" name="email" type="STRING"/>
+            <column header="is_moderator" name="is_moderator" type="BOOLEAN"/>
+            <column header="name" name="name" type="STRING"/>
+            <column header="password" name="password" type="STRING"/>
+            <column header="photo" name="photo" type="skip"/>
+            <column header="reg_time" name="reg_time" type="DATE"/>
+        </loadData>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-17">
+        <addPrimaryKey columnNames="post_id, tag_id" constraintName="PRIMARY" tableName="post2tag"/>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-18">
+        <createIndex indexName="FK_moderator_id" tableName="posts">
+            <column name="moderator_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-19">
+        <createIndex indexName="FK_parent_id" tableName="post_comments">
+            <column name="parent_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-20">
+        <createIndex indexName="FK_post_id" tableName="post_comments">
+            <column name="post_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-21">
+        <createIndex indexName="FK_post_id" tableName="post_votes">
+            <column name="post_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-22">
+        <createIndex indexName="FK_tag_id" tableName="post2tag">
+            <column name="tag_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-23">
+        <createIndex indexName="FK_user_id" tableName="post_comments">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-24">
+        <createIndex indexName="FK_user_id" tableName="post_votes">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1624813229211-25">
+        <createIndex indexName="FK_user_id" tableName="posts">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

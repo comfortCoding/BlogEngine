@@ -1,11 +1,13 @@
 package main.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
 
+@Data
 @Entity
 @Table(name = "post_votes")
 public class PostVote {

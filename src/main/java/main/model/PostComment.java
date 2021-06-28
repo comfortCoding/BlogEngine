@@ -1,11 +1,14 @@
 package main.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
 
+@Data
 @Entity
 @Table(name = "post_comments")
 public class PostComment {
@@ -14,13 +17,14 @@ public class PostComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "parent_id", foreignKey = @ForeignKey(name = "FK_parent_id"))
     private PostComment parentComment;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "post_id", nullable = false, foreignKey = @ForeignKey(name = "FK_post_id"))
-    private Post postID;
+    private Post post;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "FK_user_id"))
@@ -31,6 +35,6 @@ public class PostComment {
     @Column(name = "time", nullable = false)
     private Date time;
 
-    @Column(name = "text", nullable = false)
+    @Column(name = "text", nullable = false, columnDefinition = "TEXT")
     private String text;
 }
