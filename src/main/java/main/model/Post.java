@@ -7,6 +7,7 @@ import main.model.enums.ModerationStatus;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class Post {
     @Column(name = "is_active", nullable = false)
     private boolean isActive;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "moderation_status", nullable = false, columnDefinition = "VARCHAR(50) default \"NEW\"")
     private ModerationStatus moderationStatus;
 
@@ -37,7 +39,7 @@ public class Post {
     @DateTimeFormat(pattern = "yyyy.MM.dd HH-mm")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH-mm")
     @Column(name = "time", nullable = false)
-    private Date time;
+    private LocalDateTime time;
 
     @Column(name = "title", nullable = false)
     private String title;

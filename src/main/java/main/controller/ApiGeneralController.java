@@ -1,49 +1,57 @@
 package main.controller;
 
-import main.model.GlobalSetting;
+import main.api.response.InitResponse;
+import main.api.response.SettingsResponse;
+import main.api.response.TagsResponse;
 import main.repository.GlobalSettingsRepository;
-import main.response.BlogConfig;
-import org.hibernate.annotations.SQLInsert;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import main.services.GeneralService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 public class ApiGeneralController {
 
-    @Autowired
-    private GlobalSettingsRepository settingsRepo;
+    private final GlobalSettingsRepository settingsRepo;
+    private final GeneralService generalService;
 
+    public ApiGeneralController(GlobalSettingsRepository settingsRepo, GeneralService generalService) {
+        this.settingsRepo = settingsRepo;
+        this.generalService = generalService;
+    }
 
     @GetMapping(value = "/init")
-    public static ResponseEntity<?> getBlogConfig() {
-        BlogConfig config = new BlogConfig();
-        return new ResponseEntity<>(config, HttpStatus.OK);
+    public static ResponseEntity<InitResponse> getBlogConfig() {
+        return ResponseEntity
+                .ok(new InitResponse());
     }
 
     @GetMapping(value = "/settings")
-    public ResponseEntity<?> getSettings() {
+    public ResponseEntity<SettingsResponse> getSettings() {
 
-        List<GlobalSetting> settings = settingsRepo.getSettings();
+        boolean multiuserMode = settingsRepo.getSetting("MULTIUSER_MODE");
 
-        if (settings.size() > 0) {
-            return new ResponseEntity<>(settings, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+        boolean postPremoderation = settingsRepo.getSetting("POST_PREMODERATION");
+
+        boolean statisticsIsPublic = settingsRepo.getSetting("STATISTICS_IS_PUBLIC");
+
+        SettingsResponse settingsResponse = new SettingsResponse();
+
+        settingsResponse.setMULTIUSER_MODE(multiuserMode);
+        settingsResponse.setPOST_PREMODERATION(postPremoderation);
+        settingsResponse.setSTATISTICS_IS_PUBLIC(statisticsIsPublic);
+
+        return ResponseEntity
+                .ok(settingsResponse);
     }
 
     @GetMapping(value = "/tag")
-    public ResponseEntity<?> getTag(){
-        return null;
+    public ResponseEntity<TagsResponse> getTag(@RequestParam(required = false) String query) {
+        return generalService.getTags(query);
     }
 
     @GetMapping(value = "/calendar")
-    public ResponseEntity<?> getCalendar(){
+    public ResponseEntity<?> getCalendar() {
         return null;
     }
 

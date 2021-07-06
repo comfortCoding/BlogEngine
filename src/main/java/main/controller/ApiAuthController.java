@@ -1,5 +1,7 @@
 package main.controller;
 
+import main.api.response.CheckResponse;
+import main.api.response.InitResponse;
 import main.model.User;
 import main.repository.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -12,20 +14,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 public class ApiAuthController {
-/*
-    UserRepository userRepository;
 
     @GetMapping(value = "/check")
-    public ResponseEntity checkUser() {
-        User userExists = userRepository.checkUser();
+    public ResponseEntity<CheckResponse> checkUser() {
 
-        if (userExists != null) {
-            return new ResponseEntity<>(userExists, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+        CheckResponse checkResponse = new CheckResponse();
+        checkResponse.setResult(false);
+
+        return ResponseEntity
+                .ok(checkResponse);
     }
 
+    /*
     @GetMapping(value = "/captcha")
     public ResponseEntity<?> setCaptcha() {
 
@@ -36,4 +36,5 @@ public class ApiAuthController {
         }
     }
     */
+
 }
