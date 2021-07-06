@@ -1,5 +1,5 @@
 changeLogFile: 'D:/Projects/BlogEngine/src/main/resources/db/changelog/db.changelog-master.yml'
-diffChangeLogFile: 'D:/Projects/BlogEngine/src/main/resources/db/changelog/changes/db.changelog-20210628-061342227.yml'
+diffChangeLogFile: 'D:/Projects/BlogEngine/src/main/resources/db/changelog/changes/db.changelog-20210706-114322001.yml'
 driver: com.mysql.cj.jdbc.Driver
 ignoreClasspathPrefix: true
 password: lolforeal
