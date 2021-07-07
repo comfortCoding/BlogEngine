@@ -1,10 +1,7 @@
 package main.controller;
 
 import main.api.response.CheckResponse;
-import main.api.response.InitResponse;
-import main.model.User;
-import main.repository.UserRepository;
-import org.springframework.http.HttpStatus;
+import main.services.ApiAuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,14 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class ApiAuthController {
 
+    private final ApiAuthService apiAuthService;
+
+    public ApiAuthController(ApiAuthService apiAuthService) {
+        this.apiAuthService = apiAuthService;
+    }
+
     @GetMapping(value = "/check")
     public ResponseEntity<CheckResponse> checkUser() {
-
-        CheckResponse checkResponse = new CheckResponse();
-        checkResponse.setResult(false);
-
-        return ResponseEntity
-                .ok(checkResponse);
+        return apiAuthService.checkUser();
     }
 
     /*

@@ -9,6 +9,8 @@ import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
 import main.repository.PostVoteRepository;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -34,9 +36,9 @@ public class ApiPostService {
         this.postToDTOCustomMapper = Mappers.getMapper(PostToDTOCustomMapper.class);
     }
 
-    public ResponseEntity<PostsResponse> getPosts(Integer offset, Integer limit, String mode) {
+    public ResponseEntity<PostsResponse> searchPosts(Integer offset, Integer limit, String searchText) {
 
-        List<Post> allPosts = postRepository.getAllPosts(LocalDateTime.now());
+        List<Post> allPosts = postRepository.searchPostsByText(searchText, LocalDateTime.now());
         Integer postCount = allPosts.size();
 
         List<Post> responsePosts = new ArrayList<>(limit);
@@ -46,10 +48,34 @@ public class ApiPostService {
         } else {
             responsePosts = allPosts.subList(offset, allPosts.size());
         }
-
         List<PostDTO> postDTOs = new ArrayList<>();
         //используем кастомный маппер
         responsePosts.forEach(post -> postDTOs.add(postToDTOCustomMapper.postToDTOCustomMapper(post)));
+
+        //Замапим нужные значения в ДТОшки
+        postDTOs.forEach(postDTO -> postDTO.setCommentCount(postCommentRepository.countCommentsByPost(postDTO.getId())));
+        postDTOs.forEach(postDTO -> postDTO.setDislikeCount(postVoteRepository.countDisLikesByPost(postDTO.getId())));
+        postDTOs.forEach(postDTO -> postDTO.setLikeCount(postVoteRepository.countLikesByPost(postDTO.getId())));
+
+        //Сформируем ответ для фронта
+        PostsResponse response = new PostsResponse();
+        response.setCount(postCount);
+        response.setPosts(sortPostDTOByMode(postDTOs, OutputMode.RECENT.toString()));
+
+        return ResponseEntity
+                .ok(response);
+    }
+
+    public ResponseEntity<PostsResponse> getPosts(Integer offset, Integer limit, String mode) {
+
+        Pageable pageable = PageRequest.of(offset, limit);
+
+        List<Post> allPosts = postRepository.getAllPosts(LocalDateTime.now(), pageable);
+        Integer postCount = allPosts.size();
+
+        List<PostDTO> postDTOs = new ArrayList<>();
+        //используем кастомный маппер
+        allPosts.forEach(post -> postDTOs.add(postToDTOCustomMapper.postToDTOCustomMapper(post)));
 
         //Замапим нужные значения в ДТОшки
         postDTOs.forEach(postDTO -> postDTO.setCommentCount(postCommentRepository.countCommentsByPost(postDTO.getId())));

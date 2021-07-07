@@ -25,12 +25,10 @@ public class ApiPostController {
     }
 
     @GetMapping(value = "/search")
-    public ResponseEntity<?> searchPosts() {
-        if (true) {
-            return new ResponseEntity<>(1, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+    public ResponseEntity<PostsResponse> searchPosts(@RequestParam(defaultValue = "0") Integer offset,
+                                                     @RequestParam(defaultValue = "10") Integer limit,
+                                                     @RequestParam(name = "query") String searchText) {
+        return apiPostService.searchPosts(offset, limit, searchText);
     }
 
     @GetMapping(value = "/byDate")
