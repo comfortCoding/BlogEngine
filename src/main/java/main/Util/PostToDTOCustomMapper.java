@@ -17,9 +17,6 @@ public interface PostToDTOCustomMapper {
         postDTO.setUser(new UserToDTOMapper().convertToDto(post.getUser()));
         postDTO.setTitle(post.getTitle());
         postDTO.setText(new TextToAnnounceMapper().textToAnnounce(post.getText()));
-        //postDTO.setLikeCount(0);
-        //postDTO.setDislikeCount(0);
-        //postDTO.setCommentCount(0);
         postDTO.setViewCount(post.getViewCount());
 
         return postDTO;
