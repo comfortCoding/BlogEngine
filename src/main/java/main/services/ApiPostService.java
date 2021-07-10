@@ -11,6 +11,7 @@ import main.repository.PostVoteRepository;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,7 @@ public class ApiPostService {
     public ApiPostService(PostRepository postRepository,
                           PostCommentRepository postCommentRepository,
                           PostVoteRepository postVoteRepository
-                          ) {
+    ) {
         this.postRepository = postRepository;
         this.postCommentRepository = postCommentRepository;
         this.postVoteRepository = postVoteRepository;
@@ -38,19 +39,15 @@ public class ApiPostService {
 
     public ResponseEntity<PostsResponse> searchPosts(Integer offset, Integer limit, String searchText) {
 
-        List<Post> allPosts = postRepository.searchPostsByText(searchText, LocalDateTime.now());
-        Integer postCount = allPosts.size();
+        LocalDateTime dateTime = LocalDateTime.now();
 
-        List<Post> responsePosts = new ArrayList<>(limit);
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
 
-        if (allPosts.size() > offset + limit) {
-            responsePosts = allPosts.subList(offset, offset + limit);
-        } else {
-            responsePosts = allPosts.subList(offset, allPosts.size());
-        }
+        List<Post> postsPageable = postRepository.searchPostsByText(searchText, dateTime, pageable);
+
         List<PostDTO> postDTOs = new ArrayList<>();
         //используем кастомный маппер
-        responsePosts.forEach(post -> postDTOs.add(postToDTOCustomMapper.postToDTOCustomMapper(post)));
+        postsPageable.forEach(post -> postDTOs.add(postToDTOCustomMapper.postToDTOCustomMapper(post)));
 
         //Замапим нужные значения в ДТОшки
         postDTOs.forEach(postDTO -> postDTO.setCommentCount(postCommentRepository.countCommentsByPost(postDTO.getId())));
@@ -59,7 +56,7 @@ public class ApiPostService {
 
         //Сформируем ответ для фронта
         PostsResponse response = new PostsResponse();
-        response.setCount(postCount);
+        response.setCount(postRepository.getAllPosts(dateTime).size());
         response.setPosts(sortPostDTOByMode(postDTOs, OutputMode.RECENT.toString()));
 
         return ResponseEntity
@@ -68,30 +65,46 @@ public class ApiPostService {
 
     public ResponseEntity<PostsResponse> getPosts(Integer offset, Integer limit, String mode) {
 
-        Pageable pageable = PageRequest.of(offset, limit);
+        LocalDateTime dateTime = LocalDateTime.now();
 
-        List<Post> allPosts = postRepository.getAllPosts(LocalDateTime.now(), pageable);
-        Integer postCount = allPosts.size();
+        Pageable pageable = null;
+        List<Post> postsPageable = new ArrayList<>();
+
+        if (mode.equalsIgnoreCase(OutputMode.RECENT.toString())) {
+            pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
+            postsPageable = postRepository.getAllPostsTimeSort(dateTime, pageable);
+        } else if (mode.equalsIgnoreCase(OutputMode.EARLY.toString())) {
+            pageable = PageRequest.of(offset / limit, limit, Sort.by("time").ascending());
+            postsPageable = postRepository.getAllPostsTimeSort(dateTime, pageable);
+        } else if (mode.equalsIgnoreCase(OutputMode.BEST.toString())) {
+            pageable = PageRequest.of(offset / limit, limit);
+            postsPageable = postRepository.getAllPostsLikesSort(dateTime, pageable);
+        } else if (mode.equalsIgnoreCase(OutputMode.POPULAR.toString())) {
+            pageable = PageRequest.of(offset / limit, limit);
+            postsPageable = postRepository.getAllPostsCommentsSort(dateTime, pageable);
+        }
 
         List<PostDTO> postDTOs = new ArrayList<>();
         //используем кастомный маппер
-        allPosts.forEach(post -> postDTOs.add(postToDTOCustomMapper.postToDTOCustomMapper(post)));
+        postsPageable.forEach(post -> postDTOs.add(postToDTOCustomMapper.postToDTOCustomMapper(post)));
 
         //Замапим нужные значения в ДТОшки
+
         postDTOs.forEach(postDTO -> postDTO.setCommentCount(postCommentRepository.countCommentsByPost(postDTO.getId())));
         postDTOs.forEach(postDTO -> postDTO.setDislikeCount(postVoteRepository.countDisLikesByPost(postDTO.getId())));
         postDTOs.forEach(postDTO -> postDTO.setLikeCount(postVoteRepository.countLikesByPost(postDTO.getId())));
 
         //Сформируем ответ для фронта
         PostsResponse response = new PostsResponse();
-        response.setCount(postCount);
-        response.setPosts(sortPostDTOByMode(postDTOs, mode));
+        response.setCount(postRepository.getAllPosts(dateTime).size());
+        response.setPosts(postDTOs);
 
         return ResponseEntity
                 .ok(response);
     }
 
-    /** Метод для сортировки postDTOs, метод сортировки выбирается по значению mode
+    /**
+     * Метод для сортировки postDTOs, метод сортировки выбирается по значению mode
      */
     private List<PostDTO> sortPostDTOByMode(List<PostDTO> postDTOs, String mode) {
 
