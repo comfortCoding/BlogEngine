@@ -26,7 +26,37 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "WHERE p.isActive = 1 " +
             "AND p.moderationStatus = 'ACCEPTED' " +
             "AND p.time <= :nowDate ")
-    List<Post> getAllPosts(LocalDateTime nowDate, Pageable pageable);
+    List<Post> getAllPostsTimeSort(LocalDateTime nowDate, Pageable pageable);
+
+    @Query("SELECT " +
+            "p " +
+            "FROM Post p " +
+            "WHERE p.isActive = 1 " +
+            "AND p.moderationStatus = 'ACCEPTED' " +
+            "AND p.time <= :nowDate " +
+            "ORDER BY p.postCommentList.size DESC, p.time DESC ")
+    List<Post> getAllPostsCommentsSort(LocalDateTime nowDate, Pageable pageable);
+
+    @Query("SELECT " +
+            "p " +
+            "FROM Post p " +
+            "LEFT JOIN PostVote pv " +
+            "ON p.id = pv.post.id " +
+            "AND pv.isLike = 1 " +
+            "WHERE p.isActive = 1 " +
+            "AND p.moderationStatus = 'ACCEPTED' " +
+            "AND p.time <= :nowDate " +
+            "GROUP BY p.id, " +
+            "p.isActive, " +
+            "p.moderationStatus, " +
+            "p.moderator.id, " +
+            "p.text, " +
+            "p.time, " +
+            "p.title, " +
+            "p.user.id, " +
+            "p.viewCount " +
+            "ORDER BY COUNT(pv.id) DESC ")
+    List<Post> getAllPostsLikesSort(LocalDateTime nowDate, Pageable pageable);
 
     @Query("SELECT " +
             "p " +
@@ -34,6 +64,15 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "WHERE LOWER(CONCAT(p.title, p.text)) LIKE %:searchText% " +
             "AND p.isActive = 1 " +
             "AND p.moderationStatus = 'ACCEPTED' " +
-            "AND p.time <= :nowDate " )
+            "AND p.time <= :nowDate ")
+    List<Post> searchPostsByText(String searchText, LocalDateTime nowDate, Pageable pageable);
+
+    @Query("SELECT " +
+            "p " +
+            "FROM Post p " +
+            "WHERE LOWER(CONCAT(p.title, p.text)) LIKE %:searchText% " +
+            "AND p.isActive = 1 " +
+            "AND p.moderationStatus = 'ACCEPTED' " +
+            "AND p.time <= :nowDate ")
     List<Post> searchPostsByText(String searchText, LocalDateTime nowDate);
 }
