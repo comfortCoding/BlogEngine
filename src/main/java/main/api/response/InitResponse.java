@@ -1,21 +1,20 @@
 package main.api.response;
 
 import lombok.Data;
-import main.config.Config;
 
 @Data
 public class InitResponse {
 
-    private String title = Config.TITLE;
+    private String title;
 
-    private String subtitle = Config.SUBTITLE;
+    private String subtitle;
 
-    private String phone = Config.PHONE;
+    private String phone;
 
-    private String email = Config.EMAIL;
+    private String email;
 
-    private String copyright = Config.COPYRIGHT;
+    private String copyright;
 
-    private String copyrightFrom = Config.COPYRIGHT_FROM;
+    private String copyrightFrom;
 
 }

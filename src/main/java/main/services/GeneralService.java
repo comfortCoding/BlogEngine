@@ -2,22 +2,21 @@ package main.services;
 
 import main.Util.SettingsToDTOMapper;
 import main.Util.TagToDTOMapper;
-import main.api.response.InitResponse;
-import main.api.response.SettingsResponse;
-import main.api.response.TagsResponse;
 import main.model.DTO.GlobalSettingDTO;
+import main.model.DTO.InitDTO;
 import main.model.DTO.TagDTO;
 import main.model.GlobalSetting;
 import main.model.Tag;
 import main.repository.GlobalSettingsRepository;
 import main.repository.PostRepository;
 import main.repository.TagRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static main.config.Config.MAX_WEIGHT;
+import static main.config.Config.MIN_WEIGHT;
 
 @Service
 public class GeneralService {
@@ -40,30 +39,35 @@ public class GeneralService {
         this.settingsToDTOMapper = settingsToDTOMapper;
     }
 
-    public ResponseEntity<TagsResponse> getTags(String query) {
+    public List<TagDTO> getTags(String query) {
+
+        LocalDateTime dateTime = LocalDateTime.now();
+
         List<Tag> tags = tagRepository.getTags();
 
         List<TagDTO> tagDTOs = new ArrayList<>();
         tags.forEach(tag -> tagDTOs.add(tagToDTOMapper.convertToDTO(tag)));
 
-        double postCount = postRepository.getAllPosts(LocalDateTime.now()).size();
+        double postCount = postRepository.getAllPosts(dateTime).size();
 
         tagDTOs.forEach(tagDTO -> tagDTO.setWeight(tagRepository.countTagsByName(tagDTO.getName()) / postCount));
 
         //подсчитаем коэффициент по наибольшему значению
         tagDTOs.sort((tag1, tag2) -> tag2.getWeight().compareTo(tag1.getWeight()));
-        double k = 1.0 / tagDTOs.get(0).getWeight();
+        double maxWeight = tagDTOs.get(0).getWeight();
+
+        double k = 1.0 / maxWeight;
 
         tagDTOs.forEach(tagDTO -> tagDTO.setWeight(tagDTO.getWeight() / k));
 
-        TagsResponse response = new TagsResponse();
-        response.setTags(tagDTOs);
+        //корректировка минимального/максимального веса
+        tagDTOs.forEach(tagDTO -> tagDTO.setWeight(tagDTO.getWeight() < MIN_WEIGHT ? MIN_WEIGHT : tagDTO.getWeight()));
+        tagDTOs.forEach(tagDTO -> tagDTO.setWeight(tagDTO.getWeight() > MAX_WEIGHT ? MAX_WEIGHT : tagDTO.getWeight()));
 
-        return ResponseEntity
-                .ok(response);
+        return tagDTOs;
     }
 
-    public ResponseEntity<SettingsResponse> getAllSettings() {
+    public List<GlobalSettingDTO> getAllSettings() {
 
         List<GlobalSetting> globalSettings = settingsRepository.getAllSettings();
 
@@ -71,25 +75,12 @@ public class GeneralService {
 
         globalSettings.forEach(setting -> globalSettingDTOs.add(settingsToDTOMapper.convertToDTO(setting)));
 
-        HashMap<String, Boolean> settings = new HashMap<>(convertListToMap(globalSettingDTOs));
-
-        SettingsResponse settingsResponse = new SettingsResponse();
-        settingsResponse.setMultiuserMode(settings.get("MULTIUSER_MODE"));
-        settingsResponse.setPostPremoderation(settings.get("POST_PREMODERATION"));
-        settingsResponse.setStatisticsIsPublic(settings.get("STATISTICS_IS_PUBLIC"));
-
-        return ResponseEntity
-                .ok(settingsResponse);
+        return globalSettingDTOs;
     }
 
 
-    public ResponseEntity<InitResponse> getInit() {
-        return ResponseEntity
-                .ok(new InitResponse());
+    public InitDTO getInit() {
+        return new InitDTO();
     }
 
-    private Map<String, Boolean> convertListToMap(List<GlobalSettingDTO> list) {
-        return list.stream()
-                .collect(Collectors.toMap(GlobalSettingDTO::getCode, GlobalSettingDTO::getBoolValue));
-    }
 }
