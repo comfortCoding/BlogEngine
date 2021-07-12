@@ -1,6 +1,7 @@
 package main.repository;
 
 import main.model.Post;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
@@ -26,7 +27,7 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "WHERE p.isActive = 1 " +
             "AND p.moderationStatus = 'ACCEPTED' " +
             "AND p.time <= :nowDate ")
-    List<Post> getAllPostsTimeSort(LocalDateTime nowDate, Pageable pageable);
+    Page<Post> getAllPostsTimeSort(LocalDateTime nowDate, Pageable pageable);
 
     @Query("SELECT " +
             "p " +
@@ -35,7 +36,7 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "AND p.moderationStatus = 'ACCEPTED' " +
             "AND p.time <= :nowDate " +
             "ORDER BY p.postCommentList.size DESC, p.time DESC ")
-    List<Post> getAllPostsCommentsSort(LocalDateTime nowDate, Pageable pageable);
+    Page<Post> getAllPostsCommentSort(LocalDateTime nowDate, Pageable pageable);
 
     @Query("SELECT " +
             "p " +
@@ -56,7 +57,7 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "p.user.id, " +
             "p.viewCount " +
             "ORDER BY COUNT(pv.id) DESC ")
-    List<Post> getAllPostsLikesSort(LocalDateTime nowDate, Pageable pageable);
+    Page<Post> getAllPostsLikesSort(LocalDateTime nowDate, Pageable pageable);
 
     @Query("SELECT " +
             "p " +
@@ -65,14 +66,10 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "AND p.isActive = 1 " +
             "AND p.moderationStatus = 'ACCEPTED' " +
             "AND p.time <= :nowDate ")
-    List<Post> searchPostsByText(String searchText, LocalDateTime nowDate, Pageable pageable);
+    Page<Post> searchPostsByText(String searchText, LocalDateTime nowDate, Pageable pageable);
 
-    @Query("SELECT " +
-            "p " +
+    @Query("SELECT p " +
             "FROM Post p " +
-            "WHERE LOWER(CONCAT(p.title, p.text)) LIKE %:searchText% " +
-            "AND p.isActive = 1 " +
-            "AND p.moderationStatus = 'ACCEPTED' " +
-            "AND p.time <= :nowDate ")
-    List<Post> searchPostsByText(String searchText, LocalDateTime nowDate);
+            "WHERE p.id = :postID")
+    Post getPostByID(Integer postID);
 }

@@ -1,7 +1,8 @@
 package main.services;
 
 import main.Util.PostToDTOCustomMapper;
-import main.api.response.PostsResponse;
+import main.config.Config;
+import main.config.exception.NotFoundException;
 import main.model.DTO.PostDTO;
 import main.model.Post;
 import main.model.enums.OutputMode;
@@ -9,6 +10,7 @@ import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
 import main.repository.PostVoteRepository;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -37,13 +39,14 @@ public class ApiPostService {
         this.postToDTOCustomMapper = Mappers.getMapper(PostToDTOCustomMapper.class);
     }
 
-    public ResponseEntity<PostsResponse> searchPosts(Integer offset, Integer limit, String searchText) {
+    public Map<Long, List<PostDTO>> searchPosts(Integer offset, Integer limit, String searchText) {
 
         LocalDateTime dateTime = LocalDateTime.now();
 
         Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
 
-        List<Post> postsPageable = postRepository.searchPostsByText(searchText, dateTime, pageable);
+        Page<Post> postsPageable = postRepository.searchPostsByText(searchText, dateTime, pageable);
+        Long countAllPosts = postsPageable.getTotalElements();
 
         List<PostDTO> postDTOs = new ArrayList<>();
         //используем кастомный маппер
@@ -54,21 +57,19 @@ public class ApiPostService {
         postDTOs.forEach(postDTO -> postDTO.setDislikeCount(postVoteRepository.countDisLikesByPost(postDTO.getId())));
         postDTOs.forEach(postDTO -> postDTO.setLikeCount(postVoteRepository.countLikesByPost(postDTO.getId())));
 
-        //Сформируем ответ для фронта
-        PostsResponse response = new PostsResponse();
-        response.setCount(postRepository.getAllPosts(dateTime).size());
-        response.setPosts(sortPostDTOByMode(postDTOs, OutputMode.RECENT.toString()));
-
-        return ResponseEntity
-                .ok(response);
+        Map<Long, List<PostDTO>> map = new HashMap<>();
+        map.put(countAllPosts, postDTOs);
+        return map;
     }
 
-    public ResponseEntity<PostsResponse> getPosts(Integer offset, Integer limit, String mode) {
+    public Map<Long, List<PostDTO>> getPosts(Integer offset,
+                                             Integer limit,
+                                             String mode) throws NotFoundException {
 
         LocalDateTime dateTime = LocalDateTime.now();
 
         Pageable pageable = null;
-        List<Post> postsPageable = new ArrayList<>();
+        Page<Post> postsPageable = null;
 
         if (mode.equalsIgnoreCase(OutputMode.RECENT.toString())) {
             pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
@@ -81,54 +82,31 @@ public class ApiPostService {
             postsPageable = postRepository.getAllPostsLikesSort(dateTime, pageable);
         } else if (mode.equalsIgnoreCase(OutputMode.POPULAR.toString())) {
             pageable = PageRequest.of(offset / limit, limit);
-            postsPageable = postRepository.getAllPostsCommentsSort(dateTime, pageable);
+            postsPageable = postRepository.getAllPostsCommentSort(dateTime, pageable);
         }
 
         List<PostDTO> postDTOs = new ArrayList<>();
+
+        if (postsPageable == null) {
+            throw new NotFoundException(Config.ERROR_NO_POSTS_IN_DB);
+        }
+
         //используем кастомный маппер
         postsPageable.forEach(post -> postDTOs.add(postToDTOCustomMapper.postToDTOCustomMapper(post)));
 
         //Замапим нужные значения в ДТОшки
-
         postDTOs.forEach(postDTO -> postDTO.setCommentCount(postCommentRepository.countCommentsByPost(postDTO.getId())));
         postDTOs.forEach(postDTO -> postDTO.setDislikeCount(postVoteRepository.countDisLikesByPost(postDTO.getId())));
         postDTOs.forEach(postDTO -> postDTO.setLikeCount(postVoteRepository.countLikesByPost(postDTO.getId())));
 
-        //Сформируем ответ для фронта
-        PostsResponse response = new PostsResponse();
-        response.setCount(postRepository.getAllPosts(dateTime).size());
-        response.setPosts(postDTOs);
-
-        return ResponseEntity
-                .ok(response);
+        Map<Long, List<PostDTO>> map = new HashMap<>();
+        map.put(postsPageable.getTotalElements(), postDTOs);
+        return map;
     }
 
-    /**
-     * Метод для сортировки postDTOs, метод сортировки выбирается по значению mode
-     */
-    private List<PostDTO> sortPostDTOByMode(List<PostDTO> postDTOs, String mode) {
-
-        if (mode.equalsIgnoreCase(OutputMode.RECENT.toString())) {
-
-            //recent - сортировать по дате публикации, сначала новые
-            postDTOs.sort((post1, post2) -> post2.getTimestamp().compareTo(post1.getTimestamp()));
-
-        } else if (mode.equalsIgnoreCase(OutputMode.POPULAR.toString())) {
-
-            //popular - сортировать по убыванию количества комментариев
-            postDTOs.sort((post1, post2) -> post2.getCommentCount().compareTo(post1.getCommentCount()));
-        } else if (mode.equalsIgnoreCase(OutputMode.BEST.toString())) {
-
-            //best - сортировать по убыванию количества лайков
-            postDTOs.sort((post1, post2) -> post2.getLikeCount().compareTo(post1.getLikeCount()));
-
-        } else if (mode.equalsIgnoreCase(OutputMode.EARLY.toString())) {
-
-            //early - сортировать по дате публикации, сначала старые
-            postDTOs.sort((post1, post2) -> post1.getTimestamp().compareTo(post2.getTimestamp()));
-        }
-
-        return postDTOs;
+    public ResponseEntity<?> getPostByID(Integer postID) {
+        Post post = postRepository.getPostByID(postID);
+        
+        return ResponseEntity.ok(null);
     }
-
 }
