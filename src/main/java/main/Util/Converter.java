@@ -1,7 +1,7 @@
 package main.Util;
 
 
-import main.model.DTO.GlobalSettingDTO;
+import main.model.dto.GlobalSettingDTO;
 
 import java.util.List;
 import java.util.Map;

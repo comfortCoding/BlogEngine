@@ -1,7 +1,7 @@
 package main.api.response;
 
 import lombok.Data;
-import main.model.DTO.TagDTO;
+import main.model.dto.TagDTO;
 
 import java.util.List;
 

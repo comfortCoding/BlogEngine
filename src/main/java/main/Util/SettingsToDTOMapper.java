@@ -1,6 +1,6 @@
 package main.Util;
 
-import main.model.DTO.GlobalSettingDTO;
+import main.model.dto.GlobalSettingDTO;
 import main.model.GlobalSetting;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

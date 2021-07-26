@@ -1,16 +1,12 @@
 package main.controller;
 
+import main.api.response.PostResponse;
 import main.api.response.PostsResponse;
-import main.config.Config;
 import main.config.exception.NotFoundException;
-import main.model.DTO.PostDTO;
 import main.services.ApiPostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/post")
@@ -27,22 +23,7 @@ public class ApiPostController {
                                                   @RequestParam(defaultValue = "10") Integer limit,
                                                   @RequestParam(defaultValue = "recent") String mode) throws NotFoundException {
 
-        Map<Long, List<PostDTO>> result = apiPostService.getPosts(offset, limit, mode);
-
-        if (result.size() != 1) {
-            throw new NotFoundException(Config.ERROR_INCORRECT_HASHMAP_POSTS);
-        }
-
-        //Сформируем ответ для фронта
-        PostsResponse response = new PostsResponse();
-
-        for (Map.Entry<Long, List<PostDTO>> entry : result.entrySet()) {
-            response.setCount(entry.getKey());
-            response.setPosts(entry.getValue());
-        }
-
-        return ResponseEntity
-                .ok(response);
+        return apiPostService.getPosts(offset, limit, mode);
     }
 
     @GetMapping(value = "/search")
@@ -50,26 +31,11 @@ public class ApiPostController {
                                                      @RequestParam(defaultValue = "10") Integer limit,
                                                      @RequestParam(name = "query") String searchText) throws NotFoundException {
 
-        Map<Long, List<PostDTO>> result = apiPostService.searchPosts(offset, limit, searchText);
-
-        if (result.size() != 1) {
-            throw new NotFoundException(Config.ERROR_INCORRECT_HASHMAP_POSTS);
-        }
-
-        //Сформируем ответ для фронта
-        PostsResponse response = new PostsResponse();
-
-        for (Map.Entry<Long, List<PostDTO>> entry : result.entrySet()) {
-            response.setCount(entry.getKey());
-            response.setPosts(entry.getValue());
-        }
-
-        return ResponseEntity
-                .ok(response);
+        return apiPostService.searchPosts(offset, limit, searchText);
     }
 
     @GetMapping(value = "/{ID}")
-    public ResponseEntity<?> getPostByID(@PathVariable(name = "id") Integer postID) {
+    public ResponseEntity<PostResponse> getPostByID(@PathVariable(name = "ID") Integer postID) {
         return apiPostService.getPostByID(postID);
     }
 
