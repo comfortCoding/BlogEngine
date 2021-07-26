@@ -1,7 +1,7 @@
 package main.api.response;
 
 import lombok.Data;
-import main.model.DTO.UserDTO;
+import main.model.dto.UserDTO;
 
 @Data
 public class CheckResponse {

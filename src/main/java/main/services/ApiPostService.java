@@ -1,14 +1,14 @@
 package main.services;
 
 import main.Util.PostToDTOCustomMapper;
-import main.config.Config;
+import main.api.response.PostResponse;
+import main.api.response.PostsResponse;
 import main.config.exception.NotFoundException;
-import main.model.DTO.PostDTO;
+import main.model.dto.PostDTO;
 import main.model.Post;
 import main.model.enums.OutputMode;
-import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
-import main.repository.PostVoteRepository;
+import main.repository.TagRepository;
 import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,23 +23,19 @@ import java.util.*;
 @Service
 public class ApiPostService {
     private final PostRepository postRepository;
-    private final PostCommentRepository postCommentRepository;
-    private final PostVoteRepository postVoteRepository;
+    private final TagRepository tagRepository;
 
     private final PostToDTOCustomMapper postToDTOCustomMapper;
 
     public ApiPostService(PostRepository postRepository,
-                          PostCommentRepository postCommentRepository,
-                          PostVoteRepository postVoteRepository
-    ) {
+                          TagRepository tagRepository) {
         this.postRepository = postRepository;
-        this.postCommentRepository = postCommentRepository;
-        this.postVoteRepository = postVoteRepository;
+        this.tagRepository = tagRepository;
 
         this.postToDTOCustomMapper = Mappers.getMapper(PostToDTOCustomMapper.class);
     }
 
-    public Map<Long, List<PostDTO>> searchPosts(Integer offset, Integer limit, String searchText) {
+    public ResponseEntity<PostsResponse> searchPosts(Integer offset, Integer limit, String searchText) {
 
         LocalDateTime dateTime = LocalDateTime.now();
 
@@ -48,23 +44,20 @@ public class ApiPostService {
         Page<Post> postsPageable = postRepository.searchPostsByText(searchText, dateTime, pageable);
         Long countAllPosts = postsPageable.getTotalElements();
 
-        List<PostDTO> postDTOs = new ArrayList<>();
-        //используем кастомный маппер
-        postsPageable.forEach(post -> postDTOs.add(postToDTOCustomMapper.postToDTOCustomMapper(post)));
+        List<PostDTO> postDTOs = mapPosts(postsPageable);
 
-        //Замапим нужные значения в ДТОшки
-        postDTOs.forEach(postDTO -> postDTO.setCommentCount(postCommentRepository.countCommentsByPost(postDTO.getId())));
-        postDTOs.forEach(postDTO -> postDTO.setDislikeCount(postVoteRepository.countDisLikesByPost(postDTO.getId())));
-        postDTOs.forEach(postDTO -> postDTO.setLikeCount(postVoteRepository.countLikesByPost(postDTO.getId())));
+        //Сформируем ответ для фронта
+        PostsResponse response = new PostsResponse();
+        response.setCount(countAllPosts);
+        response.setPosts(postDTOs);
 
-        Map<Long, List<PostDTO>> map = new HashMap<>();
-        map.put(countAllPosts, postDTOs);
-        return map;
+        return ResponseEntity
+                .ok(response);
     }
 
-    public Map<Long, List<PostDTO>> getPosts(Integer offset,
-                                             Integer limit,
-                                             String mode) throws NotFoundException {
+    public ResponseEntity<PostsResponse> getPosts(Integer offset,
+                                                  Integer limit,
+                                                  String mode) throws NotFoundException {
 
         LocalDateTime dateTime = LocalDateTime.now();
 
@@ -85,28 +78,56 @@ public class ApiPostService {
             postsPageable = postRepository.getAllPostsCommentSort(dateTime, pageable);
         }
 
-        List<PostDTO> postDTOs = new ArrayList<>();
+        Long countAllPosts = postsPageable.getTotalElements();
 
-        if (postsPageable == null) {
-            throw new NotFoundException(Config.ERROR_NO_POSTS_IN_DB);
-        }
+        List<PostDTO> postDTOs = mapPosts(postsPageable);
+
+        //Сформируем ответ для фронта
+        PostsResponse response = new PostsResponse();
+        response.setCount(countAllPosts);
+        response.setPosts(postDTOs);
+
+        return ResponseEntity
+                .ok(response);
+    }
+
+    public ResponseEntity<PostResponse> getPostByID(Integer postID) {
+
+        Post post = postRepository.getPostByID(postID);
+
+        PostDTO postDTO = postToDTOCustomMapper.postToDTOCustomMapper(post);
+
+        List<String> tags = tagRepository.getTagNamesByPostID(postID);
+
+        //Сформируем ответ для фронта
+        PostResponse response = new PostResponse();
+
+        response.setId(postDTO.getId());
+        response.setTimestamp(postDTO.getTimestamp());
+        response.setActive(postDTO.isActive());
+        response.setUser(postDTO.getUser());
+        response.setTitle(postDTO.getTitle());
+        response.setText(postDTO.getText());
+        response.setLikeCount(postDTO.getLikeCount());
+        response.setDislikeCount(postDTO.getDislikeCount());
+        response.setViewCount(postDTO.getViewCount());
+        response.setComments(postDTO.getCommentsList());
+        response.setTags(tags);
+
+        return ResponseEntity
+                .ok(response);
+    }
+
+    /**
+     * Внутренние методы сервиса
+     * */
+
+    private List<PostDTO> mapPosts(Page<Post> postsPageable) {
+        List<PostDTO> postDTOs = new ArrayList<>();
 
         //используем кастомный маппер
         postsPageable.forEach(post -> postDTOs.add(postToDTOCustomMapper.postToDTOCustomMapper(post)));
 
-        //Замапим нужные значения в ДТОшки
-        postDTOs.forEach(postDTO -> postDTO.setCommentCount(postCommentRepository.countCommentsByPost(postDTO.getId())));
-        postDTOs.forEach(postDTO -> postDTO.setDislikeCount(postVoteRepository.countDisLikesByPost(postDTO.getId())));
-        postDTOs.forEach(postDTO -> postDTO.setLikeCount(postVoteRepository.countLikesByPost(postDTO.getId())));
-
-        Map<Long, List<PostDTO>> map = new HashMap<>();
-        map.put(postsPageable.getTotalElements(), postDTOs);
-        return map;
-    }
-
-    public ResponseEntity<?> getPostByID(Integer postID) {
-        Post post = postRepository.getPostByID(postID);
-        
-        return ResponseEntity.ok(null);
+        return postDTOs;
     }
 }

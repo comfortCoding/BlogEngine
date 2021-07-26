@@ -1,73 +1,87 @@
 package main.services;
 
-import main.Util.SettingsToDTOMapper;
-import main.Util.TagToDTOMapper;
-import main.model.DTO.GlobalSettingDTO;
-import main.model.DTO.InitDTO;
-import main.model.DTO.TagDTO;
+import main.Util.*;
+import main.api.response.GlobalSettingsResponse;
+import main.api.response.InitResponse;
+import main.api.response.TagsResponse;
+import main.config.exception.ValidationException;
+import main.model.Post;
+import main.model.dto.CalendarDTO;
+import main.model.dto.GlobalSettingDTO;
+import main.model.dto.InitDTO;
+import main.model.dto.TagDTO;
 import main.model.GlobalSetting;
-import main.model.Tag;
+import main.model.answer.TagAnswer;
 import main.repository.GlobalSettingsRepository;
 import main.repository.PostRepository;
 import main.repository.TagRepository;
+import org.mapstruct.factory.Mappers;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.*;
-
-import static main.config.Config.MAX_WEIGHT;
-import static main.config.Config.MIN_WEIGHT;
 
 @Service
 public class GeneralService {
     private final TagRepository tagRepository;
-    private final PostRepository postRepository;
     private final GlobalSettingsRepository settingsRepository;
+    private final PostRepository postRepository;
 
-    private final TagToDTOMapper tagToDTOMapper;
     private final SettingsToDTOMapper settingsToDTOMapper;
+    private final TagToDTOCustomMapper tagToDTOCustomMapper;
 
     public GeneralService(TagRepository tagRepository,
-                          PostRepository postRepository,
                           GlobalSettingsRepository settingsRepository,
-                          TagToDTOMapper tagToDTOMapper,
+                          PostRepository postRepository,
                           SettingsToDTOMapper settingsToDTOMapper) {
         this.tagRepository = tagRepository;
-        this.postRepository = postRepository;
         this.settingsRepository = settingsRepository;
-        this.tagToDTOMapper = tagToDTOMapper;
+        this.postRepository = postRepository;
         this.settingsToDTOMapper = settingsToDTOMapper;
+        this.tagToDTOCustomMapper = Mappers.getMapper(TagToDTOCustomMapper.class);
     }
 
-    public List<TagDTO> getTags(String query) {
+    public ResponseEntity<InitResponse> getBlogConfig(){
+        InitDTO dto = new InitDTO();
 
-        LocalDateTime dateTime = LocalDateTime.now();
+        //сформируем ответ для фронта
+        InitResponse response = new InitResponse();
 
-        List<Tag> tags = tagRepository.getTags();
+        response.setTitle(dto.getTitle());
+        response.setSubtitle(dto.getSubtitle());
+        response.setCopyright(dto.getCopyright());
+        response.setCopyrightFrom(dto.getCopyrightFrom());
+        response.setEmail(dto.getEmail());
+        response.setPhone(dto.getPhone());
+
+        return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<TagsResponse> getTags(String query) {
+
+        List<TagAnswer> tags = tagRepository.getTagView(query == null ? "" : query);
 
         List<TagDTO> tagDTOs = new ArrayList<>();
-        tags.forEach(tag -> tagDTOs.add(tagToDTOMapper.convertToDTO(tag)));
+        tags.forEach(tag -> tagDTOs.add(tagToDTOCustomMapper.tagToDTOCustomMapper(tag)));
 
-        double postCount = postRepository.getAllPosts(dateTime).size();
+        //сформируем ответ для фронта
+        TagsResponse response = new TagsResponse();
+        response.setTags(tagDTOs);
 
-        tagDTOs.forEach(tagDTO -> tagDTO.setWeight(tagRepository.countTagsByName(tagDTO.getName()) / postCount));
-
-        //подсчитаем коэффициент по наибольшему значению
-        tagDTOs.sort((tag1, tag2) -> tag2.getWeight().compareTo(tag1.getWeight()));
-        double maxWeight = tagDTOs.get(0).getWeight();
-
-        double k = 1.0 / maxWeight;
-
-        tagDTOs.forEach(tagDTO -> tagDTO.setWeight(tagDTO.getWeight() / k));
-
-        //корректировка минимального/максимального веса
-        tagDTOs.forEach(tagDTO -> tagDTO.setWeight(tagDTO.getWeight() < MIN_WEIGHT ? MIN_WEIGHT : tagDTO.getWeight()));
-        tagDTOs.forEach(tagDTO -> tagDTO.setWeight(tagDTO.getWeight() > MAX_WEIGHT ? MAX_WEIGHT : tagDTO.getWeight()));
-
-        return tagDTOs;
+        return ResponseEntity
+                .ok(response);
     }
 
-    public List<GlobalSettingDTO> getAllSettings() {
+    public ResponseEntity<?> getCalendar(String yearParam) throws ValidationException {
+
+
+
+        //сформируем ответ для фронта
+        return ResponseEntity
+                .ok(null);
+    }
+
+    public ResponseEntity<GlobalSettingsResponse> getSettings() {
 
         List<GlobalSetting> globalSettings = settingsRepository.getAllSettings();
 
@@ -75,12 +89,15 @@ public class GeneralService {
 
         globalSettings.forEach(setting -> globalSettingDTOs.add(settingsToDTOMapper.convertToDTO(setting)));
 
-        return globalSettingDTOs;
+        HashMap<String, Boolean> settings = new HashMap<>(Converter.convertSettingsListToMap(globalSettingDTOs));
+
+        //сформируем ответ для фронта
+        GlobalSettingsResponse globalSettingsResponse = new GlobalSettingsResponse();
+        globalSettingsResponse.setMultiuserMode(settings.get("MULTIUSER_MODE"));
+        globalSettingsResponse.setPostPremoderation(settings.get("POST_PREMODERATION"));
+        globalSettingsResponse.setStatisticsIsPublic(settings.get("STATISTICS_IS_PUBLIC"));
+
+        return ResponseEntity
+                .ok(globalSettingsResponse);
     }
-
-
-    public InitDTO getInit() {
-        return new InitDTO();
-    }
-
 }

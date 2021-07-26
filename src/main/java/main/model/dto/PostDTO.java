@@ -1,9 +1,12 @@
-package main.model.DTO;
+package main.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import main.model.PostComment;
+
+import java.util.List;
 
 
 @Data
@@ -16,6 +19,9 @@ public class PostDTO {
 
     @JsonProperty(value = "timestamp")
     private Long timestamp;
+
+    @JsonProperty(value = "active")
+    private boolean isActive;
 
     @JsonProperty(value = "user")
     private UserDTO user;
@@ -31,6 +37,9 @@ public class PostDTO {
 
     @JsonProperty(value = "dislikeCount")
     private Integer dislikeCount;
+
+    @JsonProperty(value = "comments")
+    private List<PostComment> commentsList;
 
     @JsonProperty(value = "commentCount")
     private Integer commentCount;
