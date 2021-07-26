@@ -25,18 +25,15 @@ import java.util.*;
 public class GeneralService {
     private final TagRepository tagRepository;
     private final GlobalSettingsRepository settingsRepository;
-    private final PostRepository postRepository;
 
     private final SettingsToDTOMapper settingsToDTOMapper;
     private final TagToDTOCustomMapper tagToDTOCustomMapper;
 
     public GeneralService(TagRepository tagRepository,
-                          GlobalSettingsRepository settingsRepository,
-                          PostRepository postRepository,
+                          GlobalSettingsRepository settingsRepository, 
                           SettingsToDTOMapper settingsToDTOMapper) {
         this.tagRepository = tagRepository;
         this.settingsRepository = settingsRepository;
-        this.postRepository = postRepository;
         this.settingsToDTOMapper = settingsToDTOMapper;
         this.tagToDTOCustomMapper = Mappers.getMapper(TagToDTOCustomMapper.class);
     }
