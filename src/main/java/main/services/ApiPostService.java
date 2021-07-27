@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -35,7 +34,7 @@ public class ApiPostService {
         this.postToDTOCustomMapper = Mappers.getMapper(PostToDTOCustomMapper.class);
     }
 
-    public ResponseEntity<PostsResponse> searchPosts(Integer offset, Integer limit, String searchText) {
+    public PostsResponse searchPosts(Integer offset, Integer limit, String searchText) {
 
         LocalDateTime dateTime = LocalDateTime.now();
 
@@ -51,11 +50,10 @@ public class ApiPostService {
         response.setCount(countAllPosts);
         response.setPosts(postDTOs);
 
-        return ResponseEntity
-                .ok(response);
+        return response;
     }
 
-    public ResponseEntity<PostsResponse> getPosts(Integer offset,
+    public PostsResponse getPosts(Integer offset,
                                                   Integer limit,
                                                   String mode) throws NotFoundException {
 
@@ -87,11 +85,10 @@ public class ApiPostService {
         response.setCount(countAllPosts);
         response.setPosts(postDTOs);
 
-        return ResponseEntity
-                .ok(response);
+        return response;
     }
 
-    public ResponseEntity<PostResponse> getPostByID(Integer postID) {
+    public PostResponse getPostByID(Integer postID) {
 
         Post post = postRepository.getPostByID(postID);
 
@@ -114,8 +111,7 @@ public class ApiPostService {
         response.setComments(postDTO.getCommentsList());
         response.setTags(tags);
 
-        return ResponseEntity
-                .ok(response);
+        return response;
     }
 
     /**

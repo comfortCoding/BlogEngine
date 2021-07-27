@@ -53,15 +53,7 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
             "WHERE p.isActive = 1 " +
                 "AND p.moderationStatus = 'ACCEPTED' " +
                 "AND p.time <= :nowDate " +
-            "GROUP BY p.id, " +
-                "p.isActive, " +
-                "p.moderationStatus, " +
-                "p.moderator.id, " +
-                "p.text, " +
-                "p.time, " +
-                "p.title, " +
-                "p.user.id, " +
-                "p.viewCount " +
+            "GROUP BY p.id " +
             "ORDER BY COUNT(pv.id) DESC ")
     Page<Post> getAllPostsLikesSort(@Param("nowDate") LocalDateTime nowDate,
                                     @Param("pageable") Pageable pageable);

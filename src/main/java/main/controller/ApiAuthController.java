@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 @RequestMapping("/api/auth")
 public class ApiAuthController {
@@ -20,7 +19,8 @@ public class ApiAuthController {
 
     @GetMapping(value = "/check")
     public ResponseEntity<CheckResponse> checkUser() {
-        return apiAuthService.checkUser();
+        CheckResponse response = apiAuthService.checkUser();
+        return ResponseEntity.ok(response);
     }
 
     /*

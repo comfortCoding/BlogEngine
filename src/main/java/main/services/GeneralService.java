@@ -1,22 +1,19 @@
 package main.services;
 
 import main.Util.*;
+import main.api.response.CalendarResponse;
 import main.api.response.GlobalSettingsResponse;
 import main.api.response.InitResponse;
 import main.api.response.TagsResponse;
 import main.config.exception.ValidationException;
-import main.model.Post;
-import main.model.dto.CalendarDTO;
 import main.model.dto.GlobalSettingDTO;
 import main.model.dto.InitDTO;
 import main.model.dto.TagDTO;
 import main.model.GlobalSetting;
 import main.model.answer.TagAnswer;
 import main.repository.GlobalSettingsRepository;
-import main.repository.PostRepository;
 import main.repository.TagRepository;
 import org.mapstruct.factory.Mappers;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,7 +27,7 @@ public class GeneralService {
     private final TagToDTOCustomMapper tagToDTOCustomMapper;
 
     public GeneralService(TagRepository tagRepository,
-                          GlobalSettingsRepository settingsRepository, 
+                          GlobalSettingsRepository settingsRepository,
                           SettingsToDTOMapper settingsToDTOMapper) {
         this.tagRepository = tagRepository;
         this.settingsRepository = settingsRepository;
@@ -38,7 +35,7 @@ public class GeneralService {
         this.tagToDTOCustomMapper = Mappers.getMapper(TagToDTOCustomMapper.class);
     }
 
-    public ResponseEntity<InitResponse> getBlogConfig(){
+    public InitResponse getBlogConfig(){
         InitDTO dto = new InitDTO();
 
         //сформируем ответ для фронта
@@ -51,10 +48,10 @@ public class GeneralService {
         response.setEmail(dto.getEmail());
         response.setPhone(dto.getPhone());
 
-        return ResponseEntity.ok(response);
+        return response;
     }
 
-    public ResponseEntity<TagsResponse> getTags(String query) {
+    public TagsResponse getTags(String query) {
 
         List<TagAnswer> tags = tagRepository.getTagView(query == null ? "" : query);
 
@@ -65,20 +62,16 @@ public class GeneralService {
         TagsResponse response = new TagsResponse();
         response.setTags(tagDTOs);
 
-        return ResponseEntity
-                .ok(response);
+        return response;
     }
 
-    public ResponseEntity<?> getCalendar(String yearParam) throws ValidationException {
-
-
+    public CalendarResponse getCalendar(String yearParam) throws ValidationException {
 
         //сформируем ответ для фронта
-        return ResponseEntity
-                .ok(null);
+        return null;
     }
 
-    public ResponseEntity<GlobalSettingsResponse> getSettings() {
+    public GlobalSettingsResponse getSettings() {
 
         List<GlobalSetting> globalSettings = settingsRepository.getAllSettings();
 
@@ -94,7 +87,6 @@ public class GeneralService {
         globalSettingsResponse.setPostPremoderation(settings.get("POST_PREMODERATION"));
         globalSettingsResponse.setStatisticsIsPublic(settings.get("STATISTICS_IS_PUBLIC"));
 
-        return ResponseEntity
-                .ok(globalSettingsResponse);
+        return globalSettingsResponse;
     }
 }

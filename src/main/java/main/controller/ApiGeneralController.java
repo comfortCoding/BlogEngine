@@ -1,5 +1,6 @@
 package main.controller;
 
+import main.api.response.CalendarResponse;
 import main.api.response.InitResponse;
 import main.api.response.GlobalSettingsResponse;
 import main.api.response.TagsResponse;
@@ -20,22 +21,26 @@ public class ApiGeneralController {
 
     @GetMapping(value = "/init")
     public ResponseEntity<InitResponse> getBlogConfig() {
-        return generalService.getBlogConfig();
+        InitResponse response = generalService.getBlogConfig();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/settings")
     public ResponseEntity<GlobalSettingsResponse> getSettings() {
-        return generalService.getSettings();
+        GlobalSettingsResponse response = generalService.getSettings();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/tag")
     public ResponseEntity<TagsResponse> getTag(@RequestParam(required = false) String query) {
-        return generalService.getTags(query);
+        TagsResponse response = generalService.getTags(query);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/calendar")
-    public ResponseEntity<?> getCalendar(@RequestParam(required = false) String year) throws ValidationException {
-        return generalService.getCalendar(year);
+    public ResponseEntity<CalendarResponse> getCalendar(@RequestParam(required = false) String year) throws ValidationException {
+        CalendarResponse response = generalService.getCalendar(year);
+        return ResponseEntity.ok(response);
     }
 
 }
