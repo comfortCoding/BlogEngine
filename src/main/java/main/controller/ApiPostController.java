@@ -22,21 +22,22 @@ public class ApiPostController {
     public ResponseEntity<PostsResponse> getPosts(@RequestParam(defaultValue = "0") Integer offset,
                                                   @RequestParam(defaultValue = "10") Integer limit,
                                                   @RequestParam(defaultValue = "recent") String mode) throws NotFoundException {
-
-        return apiPostService.getPosts(offset, limit, mode);
+        PostsResponse response = apiPostService.getPosts(offset, limit, mode);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/search")
     public ResponseEntity<PostsResponse> searchPosts(@RequestParam(defaultValue = "0") Integer offset,
                                                      @RequestParam(defaultValue = "10") Integer limit,
                                                      @RequestParam(name = "query") String searchText) throws NotFoundException {
-
-        return apiPostService.searchPosts(offset, limit, searchText);
+        PostsResponse response = apiPostService.searchPosts(offset, limit, searchText);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/{ID}")
     public ResponseEntity<PostResponse> getPostByID(@PathVariable(name = "ID") Integer postID) {
-        return apiPostService.getPostByID(postID);
+        PostResponse response = apiPostService.getPostByID(postID);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/byDate")
