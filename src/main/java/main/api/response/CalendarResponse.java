@@ -1,14 +1,14 @@
 package main.api.response;
 
 import lombok.Data;
-import main.model.dto.CalendarDTO;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class CalendarResponse {
 
-    List<Integer> years;
+    private List<Byte> years;
 
-    CalendarDTO posts;
+    private Map<String, Long> posts;
 }

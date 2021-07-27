@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
-    <changeSet author="eyese (generated)" id="1625913030206-1">
+    <changeSet author="eyese (generated)" id="1627414117388-1">
         <createTable tableName="captcha_codes">
             <column autoIncrement="true" name="id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -16,7 +16,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-2">
+    <changeSet author="eyese (generated)" id="1627414117388-2">
         <createTable tableName="global_settings">
             <column autoIncrement="true" name="id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -32,7 +32,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-3">
+    <changeSet author="eyese (generated)" id="1627414117388-3">
         <createTable tableName="post2tag">
             <column name="tag_id" type="INT">
                 <constraints nullable="false"/>
@@ -42,7 +42,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-4">
+    <changeSet author="eyese (generated)" id="1627414117388-4">
         <createTable tableName="post_comments">
             <column autoIncrement="true" name="id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -62,7 +62,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-5">
+    <changeSet author="eyese (generated)" id="1627414117388-5">
         <createTable tableName="post_votes">
             <column autoIncrement="true" name="id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -81,7 +81,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-6">
+    <changeSet author="eyese (generated)" id="1627414117388-6">
         <createTable tableName="posts">
             <column autoIncrement="true" name="id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -110,7 +110,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-7">
+    <changeSet author="eyese (generated)" id="1627414117388-7">
         <createTable tableName="tags">
             <column autoIncrement="true" name="id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -120,7 +120,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-8">
+    <changeSet author="eyese (generated)" id="1627414117388-8">
         <createTable tableName="users">
             <column autoIncrement="true" name="id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -144,7 +144,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-9">
+    <changeSet author="eyese (generated)" id="1627414117388-9">
         <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/captcha_codes.csv" quotchar="&quot;" separator="," tableName="captcha_codes">
             <column header="id" name="id" type="NUMERIC"/>
             <column header="code" name="code" type="STRING"/>
@@ -152,7 +152,7 @@
             <column header="time" name="time" type="STRING"/>
         </loadData>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-10">
+    <changeSet author="eyese (generated)" id="1627414117388-10">
         <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/global_settings.csv" quotchar="&quot;" separator="," tableName="global_settings">
             <column header="id" name="id" type="NUMERIC"/>
             <column header="code" name="code" type="STRING"/>
@@ -160,13 +160,13 @@
             <column header="value" name="value" type="STRING"/>
         </loadData>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-11">
+    <changeSet author="eyese (generated)" id="1627414117388-11">
         <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/post2tag.csv" quotchar="&quot;" separator="," tableName="post2tag">
             <column header="tag_id" name="tag_id" type="NUMERIC"/>
             <column header="post_id" name="post_id" type="NUMERIC"/>
         </loadData>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-12">
+    <changeSet author="eyese (generated)" id="1627414117388-12">
         <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/post_comments.csv" quotchar="&quot;" separator="," tableName="post_comments">
             <column header="id" name="id" type="NUMERIC"/>
             <column header="text" name="text" type="STRING"/>
@@ -176,7 +176,7 @@
             <column header="user_id" name="user_id" type="NUMERIC"/>
         </loadData>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-13">
+    <changeSet author="eyese (generated)" id="1627414117388-13">
         <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/post_votes.csv" quotchar="&quot;" separator="," tableName="post_votes">
             <column header="id" name="id" type="NUMERIC"/>
             <column header="is_like" name="is_like" type="BOOLEAN"/>
@@ -185,7 +185,7 @@
             <column header="user_id" name="user_id" type="NUMERIC"/>
         </loadData>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-14">
+    <changeSet author="eyese (generated)" id="1627414117388-14">
         <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/posts.csv" quotchar="&quot;" separator="," tableName="posts">
             <column header="id" name="id" type="NUMERIC"/>
             <column header="is_active" name="is_active" type="BOOLEAN"/>
@@ -198,13 +198,13 @@
             <column header="user_id" name="user_id" type="NUMERIC"/>
         </loadData>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-15">
+    <changeSet author="eyese (generated)" id="1627414117388-15">
         <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/tags.csv" quotchar="&quot;" separator="," tableName="tags">
             <column header="id" name="id" type="NUMERIC"/>
             <column header="name" name="name" type="STRING"/>
         </loadData>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-16">
+    <changeSet author="eyese (generated)" id="1627414117388-16">
         <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/users.csv" quotchar="&quot;" separator="," tableName="users">
             <column header="id" name="id" type="NUMERIC"/>
             <column header="code" name="code" type="skip"/>
@@ -216,47 +216,50 @@
             <column header="reg_time" name="reg_time" type="DATE"/>
         </loadData>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-17">
+    <changeSet author="eyese (generated)" id="1627414117388-17">
         <addPrimaryKey columnNames="post_id, tag_id" constraintName="PRIMARY" tableName="post2tag"/>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-18">
+    <changeSet author="eyese (generated)" id="1627414117388-18">
         <createIndex indexName="FK_moderator_id" tableName="posts">
             <column name="moderator_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-19">
+    <changeSet author="eyese (generated)" id="1627414117388-19">
         <createIndex indexName="FK_parent_id" tableName="post_comments">
             <column name="parent_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-20">
+    <changeSet author="eyese (generated)" id="1627414117388-20">
         <createIndex indexName="FK_post_id" tableName="post_comments">
             <column name="post_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-21">
+    <changeSet author="eyese (generated)" id="1627414117388-21">
         <createIndex indexName="FK_post_id" tableName="post_votes">
             <column name="post_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-22">
+    <changeSet author="eyese (generated)" id="1627414117388-22">
         <createIndex indexName="FK_tag_id" tableName="post2tag">
             <column name="tag_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-23">
+    <changeSet author="eyese (generated)" id="1627414117388-23">
         <createIndex indexName="FK_user_id" tableName="post_comments">
             <column name="user_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-24">
+    <changeSet author="eyese (generated)" id="1627414117388-24">
         <createIndex indexName="FK_user_id" tableName="post_votes">
             <column name="user_id"/>
         </createIndex>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1625913030206-25">
+    <changeSet author="eyese (generated)" id="1627414117388-25">
         <createIndex indexName="FK_user_id" tableName="posts">
             <column name="user_id"/>
         </createIndex>
+    </changeSet>
+    <changeSet author="eyese (generated)" id="1627414117388-26">
+        <createView fullDefinition="false" remarks="VIEW" viewName="tags_view">select `tags`.`id` AS `id`,`tags`.`name` AS `name`,(case when (`tags`.`weight` &lt; 0.2) then 0.2 else `tags`.`weight` end) AS `weight` from (select `t`.`id` AS `id`,`t`.`name` AS `name`,(count(`pt`.`post_id`) / ((select (count(`pt`.`post_id`) / (select count(`p`.`id`) from `blogdb`.`posts` `p` where (`p`.`is_active` = 1))) AS `not_normalized` from ((`blogdb`.`posts` `p` join `blogdb`.`post2tag` `pt` on((`p`.`id` = `pt`.`post_id`))) join `blogdb`.`tags` `t` on((`pt`.`tag_id` = `t`.`id`))) where (`p`.`is_active` = 1) group by `t`.`name` order by `not_normalized` desc limit 1) * (select count(`p`.`id`) from `blogdb`.`posts` `p` where (`p`.`is_active` = 1)))) AS `weight` from ((`blogdb`.`posts` `p` join `blogdb`.`post2tag` `pt` on((`p`.`id` = `pt`.`post_id`))) join `blogdb`.`tags` `t` on((`pt`.`tag_id` = `t`.`id`))) where (`p`.`is_active` = 1) group by `t`.`name`) `tags`</createView>
     </changeSet>
 </databaseChangeLog>
