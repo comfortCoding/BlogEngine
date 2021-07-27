@@ -6,31 +6,37 @@ import main.api.response.GlobalSettingsResponse;
 import main.api.response.InitResponse;
 import main.api.response.TagsResponse;
 import main.config.exception.ValidationException;
+import main.model.answer.CalendarAnswer;
 import main.model.dto.GlobalSettingDTO;
 import main.model.dto.InitDTO;
 import main.model.dto.TagDTO;
 import main.model.GlobalSetting;
 import main.model.answer.TagAnswer;
 import main.repository.GlobalSettingsRepository;
+import main.repository.PostRepository;
 import main.repository.TagRepository;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 public class GeneralService {
     private final TagRepository tagRepository;
     private final GlobalSettingsRepository settingsRepository;
+    private final PostRepository postRepository;
 
     private final SettingsToDTOMapper settingsToDTOMapper;
     private final TagToDTOCustomMapper tagToDTOCustomMapper;
 
     public GeneralService(TagRepository tagRepository,
                           GlobalSettingsRepository settingsRepository,
+                          PostRepository postRepository,
                           SettingsToDTOMapper settingsToDTOMapper) {
         this.tagRepository = tagRepository;
         this.settingsRepository = settingsRepository;
+        this.postRepository = postRepository;
         this.settingsToDTOMapper = settingsToDTOMapper;
         this.tagToDTOCustomMapper = Mappers.getMapper(TagToDTOCustomMapper.class);
     }
@@ -65,10 +71,20 @@ public class GeneralService {
         return response;
     }
 
-    public CalendarResponse getCalendar(String yearParam) throws ValidationException {
+    public CalendarResponse getCalendar(Integer yearParam) throws ValidationException {
+
+        yearParam = (yearParam == null ? LocalDateTime.now().getYear() : yearParam);
+
+        List<CalendarAnswer> calendar = postRepository.postsByDate(yearParam);
+
+        List<Byte> postYears = postRepository.getPostYears();
 
         //сформируем ответ для фронта
-        return null;
+        CalendarResponse response = new CalendarResponse();
+        response.setYears(postYears);
+        response.setPosts(Converter.convertCalendarListToMap(calendar));
+
+        return response;
     }
 
     public GlobalSettingsResponse getSettings() {

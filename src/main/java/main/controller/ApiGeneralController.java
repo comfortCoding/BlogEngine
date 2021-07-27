@@ -38,7 +38,7 @@ public class ApiGeneralController {
     }
 
     @GetMapping(value = "/calendar")
-    public ResponseEntity<CalendarResponse> getCalendar(@RequestParam(required = false) String year) throws ValidationException {
+    public ResponseEntity<CalendarResponse> getCalendar(@RequestParam(required = false) Integer year) throws ValidationException {
         CalendarResponse response = generalService.getCalendar(year);
         return ResponseEntity.ok(response);
     }

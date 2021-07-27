@@ -54,8 +54,8 @@ public class ApiPostService {
     }
 
     public PostsResponse getPosts(Integer offset,
-                                                  Integer limit,
-                                                  String mode) throws NotFoundException {
+                                  Integer limit,
+                                  String mode) throws NotFoundException {
 
         LocalDateTime dateTime = LocalDateTime.now();
 
@@ -116,7 +116,7 @@ public class ApiPostService {
 
     /**
      * Внутренние методы сервиса
-     * */
+     */
 
     private List<PostDTO> mapPosts(Page<Post> postsPageable) {
         List<PostDTO> postDTOs = new ArrayList<>();
