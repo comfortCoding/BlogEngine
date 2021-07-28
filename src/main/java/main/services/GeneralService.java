@@ -75,9 +75,9 @@ public class GeneralService {
 
         yearParam = (yearParam == null ? LocalDateTime.now().getYear() : yearParam);
 
-        List<CalendarAnswer> calendar = postRepository.postsByDate(yearParam);
+        List<CalendarAnswer> calendar = postRepository.postsByDate(yearParam, LocalDateTime.now());
 
-        List<Byte> postYears = postRepository.getPostYears();
+        List<Byte> postYears = postRepository.getPostYears(LocalDateTime.now());
 
         //сформируем ответ для фронта
         CalendarResponse response = new CalendarResponse();

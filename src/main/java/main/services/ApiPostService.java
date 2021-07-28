@@ -16,7 +16,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -34,13 +37,13 @@ public class ApiPostService {
         this.postToDTOCustomMapper = Mappers.getMapper(PostToDTOCustomMapper.class);
     }
 
-    public PostsResponse searchPosts(Integer offset, Integer limit, String searchText) {
-
-        LocalDateTime dateTime = LocalDateTime.now();
+    public PostsResponse searchPosts(Integer offset,
+                                     Integer limit,
+                                     String searchText) {
 
         Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
 
-        Page<Post> postsPageable = postRepository.searchPostsByText(searchText, dateTime, pageable);
+        Page<Post> postsPageable = postRepository.searchPostsByText(searchText, LocalDateTime.now(), pageable);
         Long countAllPosts = postsPageable.getTotalElements();
 
         List<PostDTO> postDTOs = mapPosts(postsPageable);
@@ -53,27 +56,68 @@ public class ApiPostService {
         return response;
     }
 
+    public PostsResponse searchByDate(Integer offset,
+                                      Integer limit,
+                                      String searchDateString) {
+
+        LocalDateTime dateTimeFrom = LocalDateTime.parse(searchDateString + " 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        LocalDateTime dateTimeTo = LocalDateTime.parse(searchDateString + " 23:59:59", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
+
+        Page<Post> postsPageable = postRepository.getAllPostsByDate(dateTimeFrom, dateTimeTo, pageable);
+        Long countAllPosts = postsPageable.getTotalElements();
+
+        List<PostDTO> postDTOs = mapPosts(postsPageable);
+
+        //Сформируем ответ для фронта
+        PostsResponse response = new PostsResponse();
+
+        response.setCount(countAllPosts);
+        response.setPosts(postDTOs);
+
+        return response;
+    }
+
+    public PostsResponse searchByTag(Integer offset,
+                                     Integer limit,
+                                     String tag) {
+
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
+
+        Page<Post> postsPageable = postRepository.getAllPostsByTag(tag, LocalDateTime.now(), pageable);
+        Long countAllPosts = postsPageable.getTotalElements();
+
+        List<PostDTO> postDTOs = mapPosts(postsPageable);
+
+        //Сформируем ответ для фронта
+        PostsResponse response = new PostsResponse();
+
+        response.setCount(countAllPosts);
+        response.setPosts(postDTOs);
+
+        return response;
+    }
+
     public PostsResponse getPosts(Integer offset,
                                   Integer limit,
                                   String mode) throws NotFoundException {
-
-        LocalDateTime dateTime = LocalDateTime.now();
 
         Pageable pageable = null;
         Page<Post> postsPageable = null;
 
         if (mode.equalsIgnoreCase(OutputMode.RECENT.toString())) {
             pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
-            postsPageable = postRepository.getAllPostsTimeSort(dateTime, pageable);
+            postsPageable = postRepository.getAllPostsTimeSort(LocalDateTime.now(), pageable);
         } else if (mode.equalsIgnoreCase(OutputMode.EARLY.toString())) {
             pageable = PageRequest.of(offset / limit, limit, Sort.by("time").ascending());
-            postsPageable = postRepository.getAllPostsTimeSort(dateTime, pageable);
+            postsPageable = postRepository.getAllPostsTimeSort(LocalDateTime.now(), pageable);
         } else if (mode.equalsIgnoreCase(OutputMode.BEST.toString())) {
             pageable = PageRequest.of(offset / limit, limit);
-            postsPageable = postRepository.getAllPostsLikesSort(dateTime, pageable);
+            postsPageable = postRepository.getAllPostsLikesSort(LocalDateTime.now(), pageable);
         } else if (mode.equalsIgnoreCase(OutputMode.POPULAR.toString())) {
             pageable = PageRequest.of(offset / limit, limit);
-            postsPageable = postRepository.getAllPostsCommentSort(dateTime, pageable);
+            postsPageable = postRepository.getAllPostsCommentSort(LocalDateTime.now(), pageable);
         }
 
         Long countAllPosts = postsPageable.getTotalElements();

@@ -4,7 +4,6 @@ import main.api.response.PostResponse;
 import main.api.response.PostsResponse;
 import main.config.exception.NotFoundException;
 import main.services.ApiPostService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,21 +40,19 @@ public class ApiPostController {
     }
 
     @GetMapping(value = "/byDate")
-    public ResponseEntity<?> searchByDate() {
-        if (true) {
-            return new ResponseEntity<>(1, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+    public ResponseEntity<PostsResponse> searchByDate(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
+                                                      @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+                                                      @RequestParam(name = "date") String date) {
+        PostsResponse response = apiPostService.searchByDate(offset, limit, date);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/byTag")
-    public ResponseEntity<?> searchByTag() {
-        if (true) {
-            return new ResponseEntity<>(1, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
+    public ResponseEntity<PostsResponse> searchByTag(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
+                                                     @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+                                                     @RequestParam(name = "tag") String tag) {
+        PostsResponse response = apiPostService.searchByTag(offset, limit, tag);
+        return ResponseEntity.ok(response);
     }
 
 
