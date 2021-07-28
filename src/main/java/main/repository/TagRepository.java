@@ -17,25 +17,26 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
     List<Tag> getTags();
 
     @Query("SELECT " +
-            "t.name " +
+                "t.name " +
             "FROM Tag t " +
             "LEFT JOIN PostToTag ptt " +
-            "ON t.id = ptt.id.tag.id " +
+                "ON t.id = ptt.id.tag.id " +
             "LEFT JOIN Post p " +
-            "ON p.id = ptt.id.post.id " +
-            "WHERE p.id = :postID ")
+                "ON p.id = ptt.id.post.id " +
+            "WHERE p.id = :postID " +
+            "GROUP BY t.name ")
     List<String> getTagNamesByPostID(@Param("postID") Integer postID);
 
     @Query("SELECT " +
-            "COUNT(ptt.id.post.id) " +
+                "COUNT(ptt.id.post.id) " +
             "FROM Tag t " +
             "LEFT JOIN PostToTag ptt " +
-            "ON t.id = ptt.id.tag.id " +
+                "ON t.id = ptt.id.tag.id " +
             "WHERE t.name = :tagName ")
     Integer countTagsByName(@Param("tagName") String tagName);
 
     @Query("SELECT " +
-            "new main.model.answer.TagAnswer(t.name, t.weight) " +
+                "new main.model.answer.TagAnswer(t.name, t.weight) " +
             "FROM TagView t " +
             "WHERE LOWER(COALESCE(t.name,''))     LIKE %:query% ")
     List<TagAnswer> getTagView(@Param("query") String query);
