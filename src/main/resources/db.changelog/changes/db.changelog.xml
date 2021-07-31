@@ -16,7 +16,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1627414117388-2">
+    <changeSet author="eyese (generated)" id="1627761375640-2">
         <createTable tableName="global_settings">
             <column autoIncrement="true" name="id" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -152,7 +152,7 @@
             <column header="time" name="time" type="STRING"/>
         </loadData>
     </changeSet>
-    <changeSet author="eyese (generated)" id="1627414117388-10">
+    <changeSet author="eyese (generated)" id="1627761375640-10">
         <loadData commentLineStartsWith="#" encoding="UTF-8" file="db.changelog/changes/data/global_settings.csv" quotchar="&quot;" separator="," tableName="global_settings">
             <column header="id" name="id" type="NUMERIC"/>
             <column header="code" name="code" type="STRING"/>
