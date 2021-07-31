@@ -5,7 +5,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -22,7 +22,7 @@ public class User {
     @DateTimeFormat(pattern = "yyyy.MM.dd HH-mm")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH-mm")
     @Column(name = "reg_time", nullable = false)
-    private Date regTime;
+    private LocalDateTime regTime;
 
     @Column(name = "name", nullable = false)
     private String name;

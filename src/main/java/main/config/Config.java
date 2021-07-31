@@ -12,8 +12,12 @@ public class Config {
 
     public static final Integer POST_ANNOTATION_SIZE = 150;
 
-    public static final Integer MIN_YEAR = 1945;
-    public static final Integer MAX_YEAR = 2200;
+    public static final Byte MIN_PASSWORD_SIZE = 6;
 
-    public static final String ERROR_PARAMETER = "Переданный параметр некорректен";
+    public static final String EMAIL_ERROR = "Этот e-mail уже зарегистрирован";
+    public static final String NAME_ERROR = "Имя указано неверно";
+    public static final String PASSWORD_ERROR = "Пароль короче 6-ти символов";
+    public static final String CAPTCHA_ERROR = "Код с картинки введён неверно";
+
+    public static final String NAME_REGEX = "[a-zA-Zа-яА-Я]+";
 }
