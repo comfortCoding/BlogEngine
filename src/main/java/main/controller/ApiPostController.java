@@ -55,5 +55,8 @@ public class ApiPostController {
         return ResponseEntity.ok(response);
     }
 
-
+    @GetMapping(value = "/my")
+    public ResponseEntity<?> getMyPosts(){
+        return ResponseEntity.ok(null);
+    }
 }

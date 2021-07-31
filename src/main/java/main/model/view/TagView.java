@@ -1,4 +1,4 @@
-package main.model;
+package main.model.view;
 
 import lombok.Data;
 import org.hibernate.annotations.Immutable;
