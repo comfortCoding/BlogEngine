@@ -102,7 +102,6 @@ public class ApiAuthService {
             newUser.setEmail(email);
             newUser.setPassword(password);
             newUser.setRegTime(LocalDateTime.now());
-            newUser.setCode(captcha);
 
             userRepository.save(newUser);
         }
