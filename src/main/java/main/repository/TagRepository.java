@@ -11,6 +11,7 @@ import java.util.List;
 
 @Repository
 public interface TagRepository extends JpaRepository<Tag, Integer> {
+
     @Query("SELECT " +
             "t " +
             "FROM Tag t ")

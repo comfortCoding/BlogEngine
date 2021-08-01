@@ -14,6 +14,8 @@ public class Config {
 
     public static final Byte MIN_PASSWORD_SIZE = 6;
 
+    public static final Byte CAPTCHA_EXPIRES_AFTER_HOURS = 1;
+
     public static final String EMAIL_ERROR = "Этот e-mail уже зарегистрирован";
     public static final String NAME_ERROR = "Имя указано неверно";
     public static final String PASSWORD_ERROR = "Пароль короче 6-ти символов";
