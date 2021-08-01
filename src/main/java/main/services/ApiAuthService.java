@@ -49,8 +49,10 @@ public class ApiAuthService {
         CaptchaCode newCaptcha = new CaptchaCode();
         newCaptcha.setCode(code);
         newCaptcha.setSecretCode(secretCode);
-        newCaptcha.setTime(LocalDateTime.now().plusHours(1));
+        newCaptcha.setTime(LocalDateTime.now());
         captchaRepository.save(newCaptcha);
+
+        captchaRepository.deleteExpiredCaptcha(LocalDateTime.now(), CAPTCHA_EXPIRES_AFTER_HOURS);
 
         //формируем ответ для фронта
         CaptchaResponse response = new CaptchaResponse();
@@ -100,7 +102,6 @@ public class ApiAuthService {
             newUser.setEmail(email);
             newUser.setPassword(password);
             newUser.setRegTime(LocalDateTime.now());
-            newUser.setCode(captcha);
 
             userRepository.save(newUser);
         }
