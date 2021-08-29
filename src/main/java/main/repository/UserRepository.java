@@ -14,4 +14,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "WHERE u.email = :email ")
     Byte isUserPresent(@Param(value = "email") String email);
 
+
+    @Query("SELECT u " +
+            "FROM User u " +
+            "WHERE u.email = :email ")
+    User findUserByEmail(@Param(value = "email") String email);
 }

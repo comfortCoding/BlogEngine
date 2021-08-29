@@ -1,4 +1,4 @@
-package main.Util;
+package main.util;
 
 import main.model.dto.GlobalSettingDTO;
 import main.model.GlobalSetting;

@@ -43,4 +43,9 @@ public class ApiGeneralController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping(value = "/profile/my")
+    public ResponseEntity<?> getMyProfile() {
+        return ResponseEntity.ok(null);
+    }
+
 }

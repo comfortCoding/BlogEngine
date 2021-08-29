@@ -2,6 +2,7 @@ package main.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import main.model.dto.PostCommentDTO;
 import main.model.dto.UserDTO;
 import main.model.PostComment;
 
@@ -41,7 +42,7 @@ public class PostResponse {
     private Integer viewCount;
 
     @JsonProperty(value = "comments")
-    private List<PostComment> comments;
+    private List<PostCommentDTO> comments;
 
     @JsonProperty(value = "tags")
     private List<String> tags;

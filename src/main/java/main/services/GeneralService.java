@@ -1,6 +1,6 @@
 package main.services;
 
-import main.Util.*;
+import main.util.*;
 import main.api.response.CalendarResponse;
 import main.api.response.GlobalSettingsResponse;
 import main.api.response.InitResponse;

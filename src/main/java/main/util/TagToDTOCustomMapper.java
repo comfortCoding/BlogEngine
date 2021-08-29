@@ -1,4 +1,4 @@
-package main.Util;
+package main.util;
 
 import main.model.dto.TagDTO;
 import main.model.answer.TagAnswer;
@@ -8,6 +8,10 @@ import org.mapstruct.Mapper;
 public interface TagToDTOCustomMapper {
 
     default TagDTO tagToDTOCustomMapper(TagAnswer tagAnswer) {
+        if (tagAnswer == null) {
+            return null;
+        }
+
         TagDTO tagDTO = new TagDTO();
 
         tagDTO.setName(tagAnswer.getName());
