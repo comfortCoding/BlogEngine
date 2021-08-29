@@ -1,6 +1,9 @@
 package main.services;
 
-import main.Util.PostToDTOCustomMapper;
+import main.model.User;
+import main.model.enums.PostStatus;
+import main.repository.UserRepository;
+import main.util.PostToDTOCustomMapper;
 import main.api.response.PostResponse;
 import main.api.response.PostsResponse;
 import main.config.exception.NotFoundException;
@@ -14,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,13 +26,16 @@ import java.util.*;
 
 @Service
 public class ApiPostService {
+    private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
 
     private final PostToDTOCustomMapper postToDTOCustomMapper;
 
-    public ApiPostService(PostRepository postRepository,
+    public ApiPostService(UserRepository userRepository,
+                          PostRepository postRepository,
                           TagRepository tagRepository) {
+        this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.tagRepository = tagRepository;
 
@@ -44,7 +51,7 @@ public class ApiPostService {
         Page<Post> postsPageable = postRepository.searchPostsByText(searchText, LocalDateTime.now(), pageable);
         Long countAllPosts = postsPageable.getTotalElements();
 
-        List<PostDTO> postDTOs = mapPosts(postsPageable);
+        List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
 
         //Сформируем ответ для фронта
         PostsResponse response = new PostsResponse();
@@ -66,7 +73,7 @@ public class ApiPostService {
         Page<Post> postsPageable = postRepository.getAllPostsByDate(dateTimeFrom, dateTimeTo, pageable);
         Long countAllPosts = postsPageable.getTotalElements();
 
-        List<PostDTO> postDTOs = mapPosts(postsPageable);
+        List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
 
         //Сформируем ответ для фронта
         PostsResponse response = new PostsResponse();
@@ -86,7 +93,7 @@ public class ApiPostService {
         Page<Post> postsPageable = postRepository.getAllPostsByTag(tag, LocalDateTime.now(), pageable);
         Long countAllPosts = postsPageable.getTotalElements();
 
-        List<PostDTO> postDTOs = mapPosts(postsPageable);
+        List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
 
         //Сформируем ответ для фронта
         PostsResponse response = new PostsResponse();
@@ -118,11 +125,44 @@ public class ApiPostService {
             postsPageable = postRepository.getAllPostsCommentSort(LocalDateTime.now(), pageable);
         }
 
-        Long countAllPosts = postsPageable.getTotalElements();
+        Long countAllPosts = Objects.requireNonNull(postsPageable).getTotalElements();
 
-        List<PostDTO> postDTOs = mapPosts(postsPageable);
+        List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
 
-        //Сформируем ответ для фронта
+        PostsResponse response = new PostsResponse();
+        response.setCount(countAllPosts);
+        response.setPosts(postDTOs);
+
+        return response;
+    }
+
+    public PostsResponse getMyPosts(Integer offset,
+                      Integer limit,
+                      String postStatus) {
+
+        String currentUserEmail = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Integer currentUserID = userRepository.findUserByEmail(currentUserEmail).getId();
+
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
+        Page<Post> postsPageable = null;
+
+        if (postStatus.equalsIgnoreCase(PostStatus.INACTIVE.toString())) {
+            postsPageable = postRepository.getInactivePosts(currentUserID, pageable);
+        } else if (postStatus.equalsIgnoreCase(PostStatus.PENDING.toString())) {
+            postsPageable = postRepository.getPendingPosts(currentUserID, pageable);
+        } else if (postStatus.equalsIgnoreCase(PostStatus.DECLINED.toString())) {
+            postsPageable = postRepository.getDeclinedPosts(currentUserID, pageable);
+        } else if (postStatus.equalsIgnoreCase(PostStatus.PUBLISHED.toString())) {
+            postsPageable = postRepository.getPublishedPosts(currentUserID, pageable);
+        }
+
+        Long countAllPosts = Objects.requireNonNull(postsPageable).getTotalElements();
+        List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
+
         PostsResponse response = new PostsResponse();
         response.setCount(countAllPosts);
         response.setPosts(postDTOs);
@@ -138,7 +178,6 @@ public class ApiPostService {
 
         List<String> tags = tagRepository.getTagNamesByPostID(postID);
 
-        //Сформируем ответ для фронта
         PostResponse response = new PostResponse();
 
         response.setId(postDTO.getId());
@@ -156,16 +195,4 @@ public class ApiPostService {
         return response;
     }
 
-    /**
-     * Внутренние методы сервиса
-     */
-
-    private List<PostDTO> mapPosts(Page<Post> postsPageable) {
-        List<PostDTO> postDTOs = new ArrayList<>();
-
-        //используем кастомный маппер
-        postsPageable.forEach(post -> postDTOs.add(postToDTOCustomMapper.postToDTOCustomMapper(post)));
-
-        return postDTOs;
-    }
 }

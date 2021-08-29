@@ -1,4 +1,4 @@
-package main.Util;
+package main.util;
 
 import main.model.dto.UserDTO;
 import main.model.User;

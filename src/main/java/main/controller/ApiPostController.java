@@ -56,7 +56,15 @@ public class ApiPostController {
     }
 
     @GetMapping(value = "/my")
-    public ResponseEntity<?> getMyPosts(){
+    public ResponseEntity<PostsResponse> getMyPosts(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
+                                                    @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+                                                    @RequestParam(name = "status") String postStatus) {
+        PostsResponse response = apiPostService.getMyPosts(offset, limit, postStatus);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/moderation")
+    public ResponseEntity<?> getPostsForModeration() {
         return ResponseEntity.ok(null);
     }
 }

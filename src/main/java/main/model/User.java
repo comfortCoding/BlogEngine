@@ -2,6 +2,7 @@ package main.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+import main.model.enums.Role;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
@@ -38,4 +39,8 @@ public class User {
 
     @Column(name = "photo", columnDefinition="TEXT")
     private String photo;
+
+    public Role getRole() {
+        return this.isModerator ? Role.MODERATOR : Role.USER;
+    }
 }

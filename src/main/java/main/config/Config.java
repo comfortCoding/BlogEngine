@@ -21,5 +21,5 @@ public class Config {
     public static final String PASSWORD_ERROR = "Пароль короче 6-ти символов";
     public static final String CAPTCHA_ERROR = "Код с картинки введён неверно";
 
-    public static final String NAME_REGEX = "[a-zA-Zа-яА-Я]+";
+    public static final String NAME_REGEX = "[a-zA-Zа-яА-Я w]+";
 }

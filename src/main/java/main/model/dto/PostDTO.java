@@ -39,7 +39,7 @@ public class PostDTO {
     private Integer dislikeCount;
 
     @JsonProperty(value = "comments")
-    private List<PostComment> commentsList;
+    private List<PostCommentDTO> commentsList;
 
     @JsonProperty(value = "commentCount")
     private Integer commentCount;

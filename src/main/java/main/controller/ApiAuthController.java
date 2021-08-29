@@ -1,12 +1,15 @@
 package main.controller;
 
-import main.api.response.CaptchaResponse;
-import main.api.response.CheckResponse;
+import main.api.request.LoginRequest;
+import main.api.response.*;
 import main.api.request.RegisterRequest;
-import main.api.response.RegisterResponse;
 import main.services.ApiAuthService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -19,8 +22,8 @@ public class ApiAuthController {
     }
 
     @GetMapping(value = "/check")
-    public ResponseEntity<CheckResponse> checkUser() {
-        CheckResponse response = apiAuthService.checkUser();
+    public ResponseEntity<LoginResponse> checkUser(Principal principal) {
+        LoginResponse response = apiAuthService.checkUser(principal);
         return ResponseEntity.ok(response);
     }
 
@@ -37,12 +40,14 @@ public class ApiAuthController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<?> loginUser(){
-        return ResponseEntity.ok(null);
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest request){
+        LoginResponse response = apiAuthService.loginUser(request);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/logout")
-    public ResponseEntity<?> logoutUser(){
-        return ResponseEntity.ok(null);
+    public ResponseEntity<LogoutResponse> logoutUser(){
+        LogoutResponse response = apiAuthService.logoutUser();
+        return ResponseEntity.ok(response);
     }
 }

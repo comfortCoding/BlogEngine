@@ -1,13 +1,23 @@
-package main.Util;
+package main.util;
 
 import main.model.dto.PostDTO;
 import main.model.Post;
 import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.Page;
 
-@Mapper(uses = { DateToSecondMapper.class, TextToAnnounceMapper.class })
+import java.util.ArrayList;
+import java.util.List;
+
+@Mapper(uses = {DateToSecondMapper.class, TextToAnnounceMapper.class, CommentToDTOMapper.class})
 public interface PostToDTOCustomMapper {
 
     default PostDTO postToDTOCustomMapper(Post post) {
+
+        if (post == null) {
+            return null;
+        }
+
         PostDTO postDTO = new PostDTO();
 
         postDTO.setId(post.getId());
@@ -18,11 +28,17 @@ public interface PostToDTOCustomMapper {
         postDTO.setText(new TextToAnnounceMapper().textToAnnounce(post.getText()));
         postDTO.setViewCount(post.getViewCount());
 
-        postDTO.setCommentsList(post.getPostCommentList());
+        postDTO.setCommentsList(new CommentToDTOMapper().convertToDTO(post.getPostCommentList()));
         postDTO.setCommentCount(post.getPostCommentList().size());
         postDTO.setLikeCount(post.getPostLikeList().size());
         postDTO.setDislikeCount(post.getPostDisLikeList().size());
 
         return postDTO;
+    }
+
+    default List<PostDTO> mapper(Page<Post> posts) {
+        List<PostDTO> postDTOs = new ArrayList<>();
+        posts.forEach(post -> postDTOs.add(postToDTOCustomMapper(post)));
+        return postDTOs;
     }
 }

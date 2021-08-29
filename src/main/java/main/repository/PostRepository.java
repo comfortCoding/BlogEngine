@@ -17,19 +17,59 @@ import java.util.List;
 public interface PostRepository extends PagingAndSortingRepository<Post, Integer> {
 
     @Query("SELECT " +
-            "COUNT(p.id) " +
-            "FROM Post p " +
-            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.time <= :nowDate "
-    )
-    Integer countAllPosts(@Param("nowDate") LocalDateTime nowDate);
-
-    @Query("SELECT " +
             "p " +
             "FROM Post p " +
             "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.time <= :nowDate "
     )
     Page<Post> getAllPostsTimeSort(@Param("nowDate") LocalDateTime nowDate,
                                    @Param("pageable") Pageable pageable);
+
+    @Query("SELECT " +
+            "p " +
+            "FROM Post p " +
+            "WHERE p.isActive = 0 AND p.user.id = :userID "
+    )
+    Page<Post> getInactivePosts(@Param("userID") Integer userID,
+                                @Param("pageable") Pageable pageable);
+
+    @Query("SELECT " +
+            "p " +
+            "FROM Post p " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'NEW' AND p.user.id = :userID "
+    )
+    Page<Post> getPendingPosts(@Param("userID") Integer userID,
+                               @Param("pageable") Pageable pageable);
+
+    @Query("SELECT " +
+            "p " +
+            "FROM Post p " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'DECLINED' AND p.user.id = :userID "
+    )
+    Page<Post> getDeclinedPosts(@Param("userID") Integer userID,
+                                @Param("pageable") Pageable pageable);
+
+    @Query("SELECT " +
+            "p " +
+            "FROM Post p " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.user.id = :userID "
+    )
+    Page<Post> getPublishedPosts(@Param("userID") Integer userID,
+                                 @Param("pageable") Pageable pageable);
+
+    @Query("SELECT " +
+            "p " +
+            "FROM Post p " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'NEW' AND p.time <= :nowDate "
+    )
+    Page<Post> getPostsForModeration(@Param("nowDate") LocalDateTime nowDate,
+                                     @Param("pageable") Pageable pageable);
+
+    @Query("SELECT " +
+            "COUNT(p) " +
+            "FROM Post p " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'NEW' AND p.moderator IS NULL AND p.time <= :nowDate "
+    )
+    Integer countPostsForModeration(@Param("nowDate") LocalDateTime nowDate);
 
     @Query("SELECT " +
             "p " +
@@ -101,11 +141,11 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
     @Query("SELECT p " +
             "FROM Post p " +
             "LEFT JOIN PostToTag ptt " +
-                "ON p.id = ptt.id.post.id " +
+            "ON p.id = ptt.id.post.id " +
             "LEFT JOIN Tag t " +
-                "ON t.id = ptt.id.tag.id " +
+            "ON t.id = ptt.id.tag.id " +
             "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.time <= :nowDate " +
-                "AND t.name = :searchTag " +
+            "AND t.name = :searchTag " +
             "GROUP BY p.id "
     )
     Page<Post> getAllPostsByTag(@Param("searchTag") String searchTag,
