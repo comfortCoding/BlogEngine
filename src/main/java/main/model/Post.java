@@ -2,16 +2,19 @@ package main.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import main.model.enums.ModerationStatus;
 import org.hibernate.annotations.Where;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "posts")
 public class Post {
@@ -63,4 +66,11 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @Where(clause = "is_like = false")
     private List<PostVote> postDisLikeList;
+
+    @ManyToMany
+    @JoinTable(
+            name = "post2tag",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private List<Tag> postTagList = new ArrayList<>();
 }

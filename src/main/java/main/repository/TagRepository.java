@@ -18,6 +18,12 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
     List<Tag> getTags();
 
     @Query("SELECT " +
+            "t " +
+            "FROM Tag t " +
+            "WHERE t.name = :searchTag ")
+    Tag findTagByName(@Param("searchTag") String searchTag);
+
+    @Query("SELECT " +
                 "t.name " +
             "FROM Tag t " +
             "LEFT JOIN PostToTag ptt " +
