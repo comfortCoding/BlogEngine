@@ -1,5 +1,7 @@
 package main.controller;
 
+import main.api.request.PostDataRequest;
+import main.api.response.PostDataResponse;
 import main.api.response.PostResponse;
 import main.api.response.PostsResponse;
 import main.config.exception.NotFoundException;
@@ -36,6 +38,18 @@ public class ApiPostController {
     @GetMapping(value = "/{ID}")
     public ResponseEntity<PostResponse> getPostByID(@PathVariable(name = "ID") Integer postID) {
         PostResponse response = apiPostService.getPostByID(postID);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    public ResponseEntity<PostDataResponse> addPost(@RequestBody PostDataRequest request) {
+        PostDataResponse response = apiPostService.addPost(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(value = "/{ID}")
+    public ResponseEntity<PostDataResponse> updatePost(@PathVariable(name = "ID") Integer postID, @RequestBody PostDataRequest request) {
+        PostDataResponse response = apiPostService.updatePost(postID, request);
         return ResponseEntity.ok(response);
     }
 

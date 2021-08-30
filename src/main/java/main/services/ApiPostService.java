@@ -1,6 +1,11 @@
 package main.services;
 
+import main.api.request.PostDataRequest;
+import main.api.response.PostDataResponse;
+import main.model.Tag;
 import main.model.User;
+import main.model.dto.CreatePostErrorDTO;
+import main.model.enums.ModerationStatus;
 import main.model.enums.PostStatus;
 import main.repository.UserRepository;
 import main.util.PostToDTOCustomMapper;
@@ -20,9 +25,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static main.config.Config.*;
 
 @Service
 public class ApiPostService {
@@ -53,7 +62,6 @@ public class ApiPostService {
 
         List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
 
-        //Сформируем ответ для фронта
         PostsResponse response = new PostsResponse();
         response.setCount(countAllPosts);
         response.setPosts(postDTOs);
@@ -75,7 +83,6 @@ public class ApiPostService {
 
         List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
 
-        //Сформируем ответ для фронта
         PostsResponse response = new PostsResponse();
 
         response.setCount(countAllPosts);
@@ -95,7 +102,6 @@ public class ApiPostService {
 
         List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
 
-        //Сформируем ответ для фронта
         PostsResponse response = new PostsResponse();
 
         response.setCount(countAllPosts);
@@ -136,16 +142,55 @@ public class ApiPostService {
         return response;
     }
 
-    public PostsResponse getMyPosts(Integer offset,
-                      Integer limit,
-                      String postStatus) {
+    public PostDataResponse addPost(PostDataRequest request) {
+
+        PostDataResponse correctPostData = isCorrectPostData(request);
+
+        if (!correctPostData.isResult()) return correctPostData;
 
         String currentUserEmail = SecurityContextHolder
                 .getContext()
                 .getAuthentication()
                 .getName();
 
-        Integer currentUserID = userRepository.findUserByEmail(currentUserEmail).getId();
+        postDataRepository(new Post(), request, currentUserEmail);
+
+        PostDataResponse response = new PostDataResponse();
+        response.setResult(true);
+        return response;
+    }
+
+    public PostDataResponse updatePost(Integer postID, PostDataRequest request) {
+        String currentUserEmail = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+        
+        Post post = postRepository.getPostByID(postID);
+        
+        postDataRepository(post, request, currentUserEmail);
+
+        PostDataResponse response = new PostDataResponse();
+        response.setResult(true);
+        return response;
+    }
+
+    public PostsResponse getMyPosts(Integer offset,
+                                    Integer limit,
+                                    String postStatus) {
+
+        String currentUserEmail = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        User currentUser = userRepository.findUserByEmail(currentUserEmail);
+
+        if (currentUser == null) {
+            return new PostsResponse();
+        }
+
+        Integer currentUserID = currentUser.getId();
 
         Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
         Page<Post> postsPageable = null;
@@ -191,6 +236,74 @@ public class ApiPostService {
         response.setViewCount(postDTO.getViewCount());
         response.setComments(postDTO.getCommentsList());
         response.setTags(tags);
+
+        return response;
+    }
+
+    private List<Tag> createTagsIfNew(List<String> tagsRequest) {
+        List<Tag> tags = new ArrayList<>();
+        if (tagsRequest != null) {
+
+            for (String tagName : tagsRequest) {
+
+                Tag tag = tagRepository.findTagByName(tagName);
+
+                if (tag == null) {
+                    Tag newTag = new Tag();
+                    newTag.setName(tagName);
+                    tags.add(tagRepository.save(newTag));
+                } else {
+                    tags.add(tag);
+                }
+            }
+        }
+        return tags;
+    }
+
+    private void postDataRepository(Post post, PostDataRequest request, String currentUserEmail) {
+        post.setTime(Instant.ofEpochMilli(request.getTimestamp()).atZone(ZoneId.systemDefault()).toLocalDateTime()
+                .compareTo(LocalDateTime.now()) < 0
+                ? LocalDateTime.now()
+                : Instant.ofEpochMilli(request.getTimestamp()).atZone(ZoneId.systemDefault()).toLocalDateTime());
+        post.setTitle(request.getTitle());
+        post.setText(request.getText());
+        post.setActive(request.getActive() == 1);
+        post.setPostTagList(createTagsIfNew(request.getTags()));
+        post.setModerationStatus(ModerationStatus.NEW);
+        post.setUser(userRepository.findUserByEmail(currentUserEmail));
+        postRepository.save(post);
+    }
+
+    private PostDataResponse isCorrectPostData(PostDataRequest request) {
+
+        PostDataResponse response = new PostDataResponse();
+
+        if (request.getTitle().length() < MIN_POST_TITLE_LENGTH) {
+
+            CreatePostErrorDTO titleError = new CreatePostErrorDTO();
+            titleError.setTitleError(POST_TITLE_SHORT_ERROR);
+            List<CreatePostErrorDTO> errorDTOS = new ArrayList<>();
+            errorDTOS.add(titleError);
+
+            response.setResult(false);
+            response.setErrors(errorDTOS);
+            return response;
+        }
+
+        if (request.getText().length() < MIN_POST_BODY_LENGTH) {
+
+            CreatePostErrorDTO titleError = new CreatePostErrorDTO();
+            titleError.setTitleError(POST_BODY_SHORT_ERROR);
+            List<CreatePostErrorDTO> errorDTOS = new ArrayList<>();
+            errorDTOS.add(titleError);
+
+            response.setResult(false);
+            response.setErrors(errorDTOS);
+
+            return response;
+        }
+
+        response.setResult(true);
 
         return response;
     }

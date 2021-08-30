@@ -1,10 +1,14 @@
 package main.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name="tags")
 public class Tag {
@@ -15,4 +19,7 @@ public class Tag {
 
     @Column(name = "name", nullable = false)
     private String name;
+
+    @ManyToMany(mappedBy = "postTagList")
+    private List<Post> postViewList = new ArrayList<>();
 }

@@ -3,7 +3,6 @@ package main.util;
 import main.model.dto.PostDTO;
 import main.model.Post;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 
 import java.util.ArrayList;
@@ -25,7 +24,8 @@ public interface PostToDTOCustomMapper {
         postDTO.setTimestamp(new DateToSecondMapper().dateToSecond(post.getTime()));
         postDTO.setUser(new UserToDTOMapper().convertToDto(post.getUser()));
         postDTO.setTitle(post.getTitle());
-        postDTO.setText(new TextToAnnounceMapper().textToAnnounce(post.getText()));
+        postDTO.setAnnounce(new TextToAnnounceMapper().textToAnnounce(post.getText()));
+        postDTO.setText(post.getText());
         postDTO.setViewCount(post.getViewCount());
 
         postDTO.setCommentsList(new CommentToDTOMapper().convertToDTO(post.getPostCommentList()));

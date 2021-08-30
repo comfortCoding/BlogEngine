@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import main.model.PostComment;
 
 import java.util.List;
 
@@ -30,6 +29,9 @@ public class PostDTO {
     private String title;
 
     @JsonProperty(value = "announce")
+    private String announce;
+
+    @JsonProperty(value = "text")
     private String text;
 
     @JsonProperty(value = "likeCount")
