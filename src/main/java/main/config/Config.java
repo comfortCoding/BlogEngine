@@ -18,6 +18,7 @@ public class Config {
 
     public static final Integer MIN_POST_TITLE_LENGTH = 3;
     public static final Integer MIN_POST_BODY_LENGTH = 50;
+    public static final Integer MIN_COMMENT_BODY_LENGTH = 15;
 
     public static final String EMAIL_ERROR = "Этот e-mail уже зарегистрирован";
     public static final String NAME_ERROR = "Имя указано неверно";
@@ -26,6 +27,8 @@ public class Config {
 
     public static final String POST_TITLE_SHORT_ERROR = "Слишком короткий заголовок";
     public static final String POST_BODY_SHORT_ERROR = "Слишком короткий пост";
+
+    public static final String COMMENT_BODY_SHORT_ERROR = "Текст комментария не задан или слишком короткий";
 
     public static final String NAME_REGEX = "[a-zA-Zа-яА-Я ]+";
     public static final String HTML_TAG_REGEX = "\\<.*?\\>";

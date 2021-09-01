@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import main.model.dto.PostCommentDTO;
 import main.model.dto.UserDTO;
-import main.model.PostComment;
 
 import java.util.List;
 

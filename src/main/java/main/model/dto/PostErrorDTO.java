@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreatePostErrorDTO {
+public class PostErrorDTO {
 
     @JsonProperty(value = "title")
-    private String titleError;
+    private String title;
 
     @JsonProperty(value = "text")
-    private String textError;
+    private String text;
 
 }

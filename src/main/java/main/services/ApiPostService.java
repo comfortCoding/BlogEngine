@@ -4,7 +4,7 @@ import main.api.request.PostDataRequest;
 import main.api.response.PostDataResponse;
 import main.model.Tag;
 import main.model.User;
-import main.model.dto.CreatePostErrorDTO;
+import main.model.dto.PostErrorDTO;
 import main.model.enums.ModerationStatus;
 import main.model.enums.PostStatus;
 import main.repository.UserRepository;
@@ -60,7 +60,7 @@ public class ApiPostService {
         Page<Post> postsPageable = postRepository.searchPostsByText(searchText, LocalDateTime.now(), pageable);
         Long countAllPosts = postsPageable.getTotalElements();
 
-        List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
+        List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
 
         PostsResponse response = new PostsResponse();
         response.setCount(countAllPosts);
@@ -81,7 +81,7 @@ public class ApiPostService {
         Page<Post> postsPageable = postRepository.getAllPostsByDate(dateTimeFrom, dateTimeTo, pageable);
         Long countAllPosts = postsPageable.getTotalElements();
 
-        List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
+        List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
 
         PostsResponse response = new PostsResponse();
 
@@ -100,7 +100,7 @@ public class ApiPostService {
         Page<Post> postsPageable = postRepository.getAllPostsByTag(tag, LocalDateTime.now(), pageable);
         Long countAllPosts = postsPageable.getTotalElements();
 
-        List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
+        List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
 
         PostsResponse response = new PostsResponse();
 
@@ -133,7 +133,7 @@ public class ApiPostService {
 
         Long countAllPosts = Objects.requireNonNull(postsPageable).getTotalElements();
 
-        List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
+        List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
 
         PostsResponse response = new PostsResponse();
         response.setCount(countAllPosts);
@@ -206,7 +206,7 @@ public class ApiPostService {
         }
 
         Long countAllPosts = Objects.requireNonNull(postsPageable).getTotalElements();
-        List<PostDTO> postDTOs = postToDTOCustomMapper.mapper(postsPageable);
+        List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
 
         PostsResponse response = new PostsResponse();
         response.setCount(countAllPosts);
@@ -219,7 +219,7 @@ public class ApiPostService {
 
         Post post = postRepository.getPostByID(postID);
 
-        PostDTO postDTO = postToDTOCustomMapper.postToDTOCustomMapper(post);
+        PostDTO postDTO = postToDTOCustomMapper.convertToDTO(post);
 
         List<String> tags = tagRepository.getTagNamesByPostID(postID);
 
@@ -280,9 +280,9 @@ public class ApiPostService {
 
         if (request.getTitle().length() < MIN_POST_TITLE_LENGTH) {
 
-            CreatePostErrorDTO titleError = new CreatePostErrorDTO();
-            titleError.setTitleError(POST_TITLE_SHORT_ERROR);
-            List<CreatePostErrorDTO> errorDTOS = new ArrayList<>();
+            PostErrorDTO titleError = new PostErrorDTO();
+            titleError.setTitle(POST_TITLE_SHORT_ERROR);
+            List<PostErrorDTO> errorDTOS = new ArrayList<>();
             errorDTOS.add(titleError);
 
             response.setResult(false);
@@ -292,9 +292,9 @@ public class ApiPostService {
 
         if (request.getText().length() < MIN_POST_BODY_LENGTH) {
 
-            CreatePostErrorDTO titleError = new CreatePostErrorDTO();
-            titleError.setTitleError(POST_BODY_SHORT_ERROR);
-            List<CreatePostErrorDTO> errorDTOS = new ArrayList<>();
+            PostErrorDTO titleError = new PostErrorDTO();
+            titleError.setTitle(POST_BODY_SHORT_ERROR);
+            List<PostErrorDTO> errorDTOS = new ArrayList<>();
             errorDTOS.add(titleError);
 
             response.setResult(false);

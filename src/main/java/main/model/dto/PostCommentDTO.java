@@ -1,13 +1,12 @@
 package main.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostCommentDTO {
@@ -21,11 +20,11 @@ public class PostCommentDTO {
     @JsonProperty(value = "post_id")
     private Integer postID;
 
-    @JsonProperty(value = "user_id")
+    @JsonProperty(value = "user")
     private UserDTO user;
 
-    @JsonProperty(value = "time")
-    private Date time;
+    @JsonProperty(value = "timestamp")
+    private Long time;
 
     @JsonProperty(value = "text")
     private String text;
