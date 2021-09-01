@@ -17,7 +17,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -168,7 +167,7 @@ public class ApiAuthService {
         LoginResponse response = new LoginResponse();
 
         response.setResult(userDB != null);
-        response.setUser(userToDTOMapper.userToDTOCustomMapper(userDB));
+        response.setUser(userToDTOMapper.convertToDTO(userDB));
         response.getUser().setModerationCounter(response.getUser().isModeration() ? postRepository.countPostsForModeration(LocalDateTime.now()) : 0);
 
         return response;

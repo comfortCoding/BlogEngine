@@ -1,10 +1,7 @@
 package main.services;
 
+import main.api.response.*;
 import main.util.*;
-import main.api.response.CalendarResponse;
-import main.api.response.GlobalSettingsResponse;
-import main.api.response.InitResponse;
-import main.api.response.TagsResponse;
 import main.config.exception.ValidationException;
 import main.model.answer.CalendarAnswer;
 import main.model.dto.GlobalSettingDTO;

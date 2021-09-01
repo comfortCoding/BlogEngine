@@ -2,30 +2,31 @@ package main.util;
 
 import main.model.PostComment;
 import main.model.dto.PostCommentDTO;
-import org.modelmapper.ModelMapper;
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class CommentToDTOMapper {
+@Mapper(uses = {DateToSecondMapper.class})
+public interface CommentToDTOMapper {
 
-    private final ModelMapper modelMapper;
+    default PostCommentDTO convertToDTO(PostComment comment) {
+        PostCommentDTO commentDTO = new PostCommentDTO();
 
-    public CommentToDTOMapper() {
-        this.modelMapper = new ModelMapper();
+        commentDTO.setParentID(comment.getParentComment() == null ? null : comment.getParentComment().getId());
+        commentDTO.setText(comment.getText());
+        commentDTO.setId(comment.getId());
+        commentDTO.setPostID(comment.getPost().getId());
+        commentDTO.setTime(new DateToSecondMapper().dateToSecond(comment.getTime()));
+        commentDTO.setUser(Mappers.getMapper(UserToDTOCustomMapper.class).convertToDTO(comment.getUser()));
 
-        modelMapper.createTypeMap(PostComment.class, PostCommentDTO.class);
+        return commentDTO;
     }
 
-    public PostCommentDTO convertToDTO(PostComment comment) {
-        return modelMapper.map(comment, PostCommentDTO.class);
-    }
-
-    public List<PostCommentDTO> convertToDTO(List<PostComment> comments) {
+    default List<PostCommentDTO> convertToDTO(List<PostComment> comments) {
         List<PostCommentDTO> commentDTOs = new ArrayList<>();
-        comments.forEach(comment -> modelMapper.map(comment, PostCommentDTO.class));
+        comments.forEach(comment -> commentDTOs.add(convertToDTO(comment)));
         return commentDTOs;
     }
 }

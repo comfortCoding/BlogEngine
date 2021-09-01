@@ -1,9 +1,7 @@
 package main.controller;
 
-import main.api.response.CalendarResponse;
-import main.api.response.InitResponse;
-import main.api.response.GlobalSettingsResponse;
-import main.api.response.TagsResponse;
+import main.api.request.CommentRequest;
+import main.api.response.*;
 import main.config.exception.ValidationException;
 import main.services.GeneralService;
 import org.springframework.http.ResponseEntity;

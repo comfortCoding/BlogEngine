@@ -7,7 +7,7 @@ import org.mapstruct.*;
 @Mapper
 public interface UserToDTOCustomMapper {
 
-    default UserDTO userToDTOCustomMapper(User user) {
+    default UserDTO convertToDTO(User user) {
         if (user == null) {
             return null;
         }
