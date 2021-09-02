@@ -43,6 +43,29 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Integer
     @Query("SELECT " +
             "p " +
             "FROM Post p " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'NEW' AND p.moderator.id IS NULL "
+    )
+    Page<Post> getNewPosts(@Param("pageable") Pageable pageable);
+
+    @Query("SELECT " +
+            "p " +
+            "FROM Post p " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'ACCEPTED' AND p.moderator.id = :userID "
+    )
+    Page<Post> getAcceptedPostsForModer(@Param("userID") Integer userID,
+                                        @Param("pageable") Pageable pageable);
+
+    @Query("SELECT " +
+            "p " +
+            "FROM Post p " +
+            "WHERE p.isActive = 1 AND p.moderationStatus = 'DECLINED' AND p.moderator.id = :userID "
+    )
+    Page<Post> getDeclinedPostsForModer(@Param("userID") Integer userID,
+                                        @Param("pageable") Pageable pageable);
+
+    @Query("SELECT " +
+            "p " +
+            "FROM Post p " +
             "WHERE p.isActive = 1 AND p.moderationStatus = 'DECLINED' AND p.user.id = :userID "
     )
     Page<Post> getDeclinedPosts(@Param("userID") Integer userID,

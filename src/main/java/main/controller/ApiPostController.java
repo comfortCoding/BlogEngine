@@ -48,7 +48,8 @@ public class ApiPostController {
     }
 
     @PutMapping(value = "/{ID}")
-    public ResponseEntity<PostDataResponse> updatePost(@PathVariable(name = "ID") Integer postID, @RequestBody PostDataRequest request) {
+    public ResponseEntity<PostDataResponse> updatePost(@PathVariable(name = "ID") Integer postID,
+                                                       @RequestBody PostDataRequest request) {
         PostDataResponse response = apiPostService.updatePost(postID, request);
         return ResponseEntity.ok(response);
     }
@@ -70,15 +71,10 @@ public class ApiPostController {
     }
 
     @GetMapping(value = "/my")
-    public ResponseEntity<PostsResponse> getMyPosts(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
-                                                    @RequestParam(name = "limit", defaultValue = "10") Integer limit,
-                                                    @RequestParam(name = "status") String postStatus) {
-        PostsResponse response = apiPostService.getMyPosts(offset, limit, postStatus);
+    public ResponseEntity<PostsResponse> getPostsByPerson(@RequestParam(name = "offset", defaultValue = "0") Integer offset,
+                                                          @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+                                                          @RequestParam(name = "status") String postStatus) {
+        PostsResponse response = apiPostService.getPostsByPerson(offset, limit, postStatus);
         return ResponseEntity.ok(response);
-    }
-
-    @GetMapping(value = "/moderation")
-    public ResponseEntity<?> getPostsForModeration() {
-        return ResponseEntity.ok(null);
     }
 }
