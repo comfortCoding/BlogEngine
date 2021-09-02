@@ -1,10 +1,13 @@
 package main.services;
 
+import main.api.request.ModerateRequest;
 import main.api.request.PostDataRequest;
+import main.api.response.ModerateResponse;
 import main.api.response.PostDataResponse;
 import main.model.Tag;
 import main.model.User;
 import main.model.dto.PostErrorDTO;
+import main.model.enums.ModeratePostStatus;
 import main.model.enums.ModerationStatus;
 import main.model.enums.PostStatus;
 import main.repository.UserRepository;
@@ -165,9 +168,9 @@ public class ApiPostService {
                 .getContext()
                 .getAuthentication()
                 .getName();
-        
+
         Post post = postRepository.getPostByID(postID);
-        
+
         postDataRepository(post, request, currentUserEmail);
 
         PostDataResponse response = new PostDataResponse();
@@ -175,9 +178,9 @@ public class ApiPostService {
         return response;
     }
 
-    public PostsResponse getMyPosts(Integer offset,
-                                    Integer limit,
-                                    String postStatus) {
+    public PostsResponse getPostsByPerson(Integer offset,
+                                          Integer limit,
+                                          String postStatus) {
 
         String currentUserEmail = SecurityContextHolder
                 .getContext()
@@ -212,6 +215,69 @@ public class ApiPostService {
         response.setCount(countAllPosts);
         response.setPosts(postDTOs);
 
+        return response;
+    }
+
+    public PostsResponse getPostsForModeration(Integer offset,
+                                               Integer limit,
+                                               String moderationStatus) {
+
+        String currentUserEmail = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Integer currentUserID = userRepository.findUserByEmail(currentUserEmail).getId();
+
+        Pageable pageable = PageRequest.of(offset / limit, limit, Sort.by("time").descending());
+        Page<Post> postsPageable = null;
+
+        if (moderationStatus.equalsIgnoreCase(ModerationStatus.NEW.toString())) {
+            postsPageable = postRepository.getNewPosts(pageable);
+        } else if (moderationStatus.equalsIgnoreCase(ModerationStatus.ACCEPTED.toString())) {
+            postsPageable = postRepository.getAcceptedPostsForModer(currentUserID, pageable);
+        } else if (moderationStatus.equalsIgnoreCase(ModerationStatus.DECLINED.toString())) {
+            postsPageable = postRepository.getDeclinedPostsForModer(currentUserID, pageable);
+        }
+
+        Long countAllPosts = Objects.requireNonNull(postsPageable).getTotalElements();
+        List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
+
+        PostsResponse response = new PostsResponse();
+        response.setCount(countAllPosts);
+        response.setPosts(postDTOs);
+
+        return response;
+    }
+
+    public ModerateResponse moderatePost(ModerateRequest request){
+
+        String currentUserEmail = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        User currentUser = userRepository.findModeratorByEmail(currentUserEmail);
+
+        Post post = postRepository.getPostByID(request.getPostID());
+
+        if (request.getDecision().equalsIgnoreCase(ModeratePostStatus.ACCEPT.toString())) {
+            post.setModerationStatus(ModerationStatus.ACCEPTED);
+
+        } else if (request.getDecision().equalsIgnoreCase(ModeratePostStatus.DECLINE.toString())) {
+            post.setModerationStatus(ModerationStatus.DECLINED);
+
+        } else {
+            ModerateResponse response = new ModerateResponse();
+            response.setResult(false);
+            return response;
+        }
+
+        post.setModerator(currentUser);
+        postRepository.save(post);
+
+        ModerateResponse response = new ModerateResponse();
+        response.setResult(true);
         return response;
     }
 
