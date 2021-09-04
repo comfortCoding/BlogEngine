@@ -1,6 +1,8 @@
 package main.controller;
 
+import main.api.request.LikeRequest;
 import main.api.request.PostDataRequest;
+import main.api.response.LikeResponse;
 import main.api.response.PostDataResponse;
 import main.api.response.PostResponse;
 import main.api.response.PostsResponse;
@@ -75,6 +77,18 @@ public class ApiPostController {
                                                           @RequestParam(name = "limit", defaultValue = "10") Integer limit,
                                                           @RequestParam(name = "status") String postStatus) {
         PostsResponse response = apiPostService.getPostsByPerson(offset, limit, postStatus);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(value = "/like")
+    public ResponseEntity<LikeResponse> likePost(@RequestBody LikeRequest request) {
+        LikeResponse response = apiPostService.likePost(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(value = "/dislike")
+    public ResponseEntity<LikeResponse> dislikePost(@RequestBody LikeRequest request) {
+        LikeResponse response = apiPostService.dislikePost(request);
         return ResponseEntity.ok(response);
     }
 }

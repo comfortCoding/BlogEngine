@@ -1,19 +1,19 @@
 package main.services;
 
+import main.api.request.LikeRequest;
 import main.api.request.ModerateRequest;
 import main.api.request.PostDataRequest;
-import main.api.response.ModerateResponse;
-import main.api.response.PostDataResponse;
+import main.api.response.*;
+import main.model.PostVote;
 import main.model.Tag;
 import main.model.User;
 import main.model.dto.PostErrorDTO;
 import main.model.enums.ModeratePostStatus;
 import main.model.enums.ModerationStatus;
 import main.model.enums.PostStatus;
+import main.repository.PostVoteRepository;
 import main.repository.UserRepository;
 import main.util.PostToDTOCustomMapper;
-import main.api.response.PostResponse;
-import main.api.response.PostsResponse;
 import main.config.exception.NotFoundException;
 import main.model.dto.PostDTO;
 import main.model.Post;
@@ -41,15 +41,18 @@ public class ApiPostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
+    private final PostVoteRepository postVoteRepository;
 
     private final PostToDTOCustomMapper postToDTOCustomMapper;
 
     public ApiPostService(UserRepository userRepository,
                           PostRepository postRepository,
-                          TagRepository tagRepository) {
+                          TagRepository tagRepository,
+                          PostVoteRepository postVoteRepository) {
         this.userRepository = userRepository;
         this.postRepository = postRepository;
         this.tagRepository = tagRepository;
+        this.postVoteRepository = postVoteRepository;
 
         this.postToDTOCustomMapper = Mappers.getMapper(PostToDTOCustomMapper.class);
     }
@@ -250,7 +253,7 @@ public class ApiPostService {
         return response;
     }
 
-    public ModerateResponse moderatePost(ModerateRequest request){
+    public ModerateResponse moderatePost(ModerateRequest request) {
 
         String currentUserEmail = SecurityContextHolder
                 .getContext()
@@ -304,6 +307,89 @@ public class ApiPostService {
         response.setTags(tags);
 
         return response;
+    }
+
+    public LikeResponse likePost(LikeRequest request) {
+
+        String currentUserEmail = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        User currentUser = userRepository.findUserByEmail(currentUserEmail);
+
+        Integer postID = request.getPostID();
+
+        Post post = postRepository.getPostByID(postID);
+
+        PostVote postVote = postVoteRepository.getVote(currentUser.getId(), postID);
+
+        if (postVote != null && !postVote.isLike()) {
+            postVote.setLike(true);
+            postVoteRepository.save(postVote);
+
+            LikeResponse likeResponse = new LikeResponse();
+            likeResponse.setResult(true);
+            return likeResponse;
+
+        } else if (postVote != null && postVote.isLike()) {
+
+            LikeResponse likeResponse = new LikeResponse();
+            likeResponse.setResult(false);
+            return likeResponse;
+        } else {
+            PostVote dislike = new PostVote();
+            dislike.setUser(currentUser);
+            dislike.setPost(post);
+            dislike.setTime(LocalDateTime.now());
+            dislike.setLike(true);
+            postVoteRepository.save(dislike);
+
+            LikeResponse likeResponse = new LikeResponse();
+            likeResponse.setResult(true);
+            return likeResponse;
+        }
+    }
+
+    public LikeResponse dislikePost(LikeRequest request) {
+
+        String currentUserEmail = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        User currentUser = userRepository.findUserByEmail(currentUserEmail);
+
+        Integer postID = request.getPostID();
+
+        Post post = postRepository.getPostByID(postID);
+
+        PostVote postVote = postVoteRepository.getVote(currentUser.getId(), postID);
+
+        if (postVote != null && postVote.isLike()) {
+            postVote.setLike(false);
+            postVoteRepository.save(postVote);
+
+            LikeResponse likeResponse = new LikeResponse();
+            likeResponse.setResult(true);
+            return likeResponse;
+        } else if (postVote != null && !postVote.isLike()) {
+
+            LikeResponse likeResponse = new LikeResponse();
+            likeResponse.setResult(false);
+            return likeResponse;
+        } else {
+            PostVote dislike = new PostVote();
+            dislike.setUser(currentUser);
+            dislike.setPost(post);
+            dislike.setTime(LocalDateTime.now());
+            dislike.setLike(false);
+            postVoteRepository.save(dislike);
+
+            LikeResponse likeResponse = new LikeResponse();
+            likeResponse.setResult(dislike.isLike());
+            return likeResponse;
+        }
     }
 
     private List<Tag> createTagsIfNew(List<String> tagsRequest) {
