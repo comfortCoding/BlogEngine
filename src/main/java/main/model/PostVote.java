@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -29,7 +30,7 @@ public class PostVote {
     @DateTimeFormat(pattern = "yyyy.MM.dd HH-mm")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH-mm")
     @Column(name = "time", nullable = false)
-    private Date time;
+    private LocalDateTime time;
 
     @Column(name = "is_like", nullable = false)
     private boolean isLike;
