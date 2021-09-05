@@ -15,7 +15,7 @@ public class Converter {
                 .collect(Collectors.toMap(GlobalSettingDTO::getCode, GlobalSettingDTO::getBoolValue));
     }
 
-    public static Map<String, Long> convertCalendarListToMap(List<CalendarAnswer> list) {
+    public static Map<String, Integer> convertCalendarListToMap(List<CalendarAnswer> list) {
         return list.stream()
                 .collect(Collectors.toMap(CalendarAnswer::getDateTime, CalendarAnswer::getPosts));
     }

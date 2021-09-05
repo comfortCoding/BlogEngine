@@ -46,4 +46,15 @@ public class ApiGeneralController {
         return ResponseEntity.ok(null);
     }
 
+    @GetMapping(value = "/statistics/all")
+    public ResponseEntity<StatisticsResponse> getAllStatistics() {
+        StatisticsResponse response = generalService.getAllStatistics();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/statistics/my")
+    public ResponseEntity<StatisticsResponse> getMyStatistics() {
+        StatisticsResponse response = generalService.getMyStatistics();
+        return ResponseEntity.ok(response);
+    }
 }

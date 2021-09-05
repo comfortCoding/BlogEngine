@@ -17,6 +17,17 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "posts")
+@NamedStoredProcedureQuery(name = "getMyFirstPostEntity",
+        procedureName = "p_user_get_first_post", parameters = {
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "user_id", type = Integer.class),
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "now_server_date", type = LocalDateTime.class),
+        @StoredProcedureParameter(mode = ParameterMode.OUT, name = "time", type = LocalDateTime.class)}
+)
+@NamedStoredProcedureQuery(name = "getFirstPostEntity",
+        procedureName = "p_get_first_post", parameters = {
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "now_server_date", type = LocalDateTime.class),
+        @StoredProcedureParameter(mode = ParameterMode.OUT, name = "time", type = LocalDateTime.class)}
+)
 public class Post {
 
     @Id

@@ -3,6 +3,7 @@ package main.api.response;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -13,5 +14,5 @@ public class CalendarResponse {
     private List<Byte> years;
 
     @JsonProperty(value = "posts")
-    private Map<String, Long> posts;
+    private Map<String, Integer> posts;
 }

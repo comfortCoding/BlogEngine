@@ -1,6 +1,8 @@
 package main.services;
 
 import main.api.response.*;
+import main.model.User;
+import main.repository.UserRepository;
 import main.util.*;
 import main.config.exception.ValidationException;
 import main.model.answer.CalendarAnswer;
@@ -12,17 +14,24 @@ import main.model.answer.TagAnswer;
 import main.repository.GlobalSettingsRepository;
 import main.repository.PostRepository;
 import main.repository.TagRepository;
+import org.apache.tomcat.jni.Local;
 import org.mapstruct.factory.Mappers;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
+
+import static main.config.Config.TIME_ZONE;
 
 @Service
 public class GeneralService {
     private final TagRepository tagRepository;
     private final GlobalSettingsRepository settingsRepository;
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     private final SettingsToDTOMapper settingsToDTOMapper;
     private final TagToDTOCustomMapper tagToDTOCustomMapper;
@@ -30,15 +39,17 @@ public class GeneralService {
     public GeneralService(TagRepository tagRepository,
                           GlobalSettingsRepository settingsRepository,
                           PostRepository postRepository,
+                          UserRepository userRepository,
                           SettingsToDTOMapper settingsToDTOMapper) {
         this.tagRepository = tagRepository;
         this.settingsRepository = settingsRepository;
         this.postRepository = postRepository;
+        this.userRepository = userRepository;
         this.settingsToDTOMapper = settingsToDTOMapper;
         this.tagToDTOCustomMapper = Mappers.getMapper(TagToDTOCustomMapper.class);
     }
 
-    public InitResponse getBlogConfig(){
+    public InitResponse getBlogConfig() {
         InitDTO dto = new InitDTO();
 
         //сформируем ответ для фронта
@@ -61,7 +72,6 @@ public class GeneralService {
         List<TagDTO> tagDTOs = new ArrayList<>();
         tags.forEach(tag -> tagDTOs.add(tagToDTOCustomMapper.tagToDTOCustomMapper(tag)));
 
-        //сформируем ответ для фронта
         TagsResponse response = new TagsResponse();
         response.setTags(tagDTOs);
 
@@ -101,5 +111,53 @@ public class GeneralService {
         globalSettingsResponse.setStatisticsIsPublic(settings.get("STATISTICS_IS_PUBLIC"));
 
         return globalSettingsResponse;
+    }
+
+    public StatisticsResponse getAllStatistics() {
+
+        String currentUserEmail = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        User currentUser = userRepository.findUserByEmail(currentUserEmail);
+
+        StatisticsResponse response = new StatisticsResponse();
+
+        response.setPostsCount(postRepository.countPosts(LocalDateTime.now()));
+        response.setViewsCount(postRepository.countViews(LocalDateTime.now()));
+        response.setLikesCount(postRepository.countLikes(LocalDateTime.now()));
+        response.setDislikesCount(postRepository.countDislikes(LocalDateTime.now()));
+
+        LocalDateTime localDateTime = postRepository.getFirstPublicationDate(LocalDateTime.now());
+        ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
+
+        response.setFirstPublication(zdt.toInstant().toEpochMilli()/1000);
+
+        return response;
+    }
+
+    public StatisticsResponse getMyStatistics() {
+
+        String currentUserEmail = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        Integer currentUserID = userRepository.findUserByEmail(currentUserEmail).getId();
+
+        StatisticsResponse response = new StatisticsResponse();
+
+        response.setPostsCount(postRepository.countMyPosts(currentUserID, LocalDateTime.now()));
+        response.setViewsCount(postRepository.countMyViews(currentUserID, LocalDateTime.now()));
+        response.setLikesCount(postRepository.countMyLikes(currentUserID, LocalDateTime.now()));
+        response.setDislikesCount(postRepository.countMyDislikes(currentUserID, LocalDateTime.now()));
+
+        LocalDateTime localDateTime = postRepository.getMyFirstPublicationDate(currentUserID, LocalDateTime.now());
+        ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
+
+        response.setFirstPublication(zdt.toInstant().toEpochMilli()/1000);
+
+        return response;
     }
 }
