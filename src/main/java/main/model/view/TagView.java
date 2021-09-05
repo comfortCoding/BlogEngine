@@ -1,14 +1,16 @@
 package main.model.view;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Immutable;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Immutable
-@Table(name = "tags_view")
+@Table(name = "v_tag_weight")
 public class TagView {
 
     @Id

@@ -2,19 +2,17 @@ package main.model.answer;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 @Data
 public class CalendarAnswer {
 
     private String dateTime;
 
-    private Long posts;
+    private Integer posts;
 
-    public CalendarAnswer(LocalDateTime dateTime, Long posts) {
+    public CalendarAnswer(String dateTime, Integer posts) {
 
-        this.dateTime = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        this.dateTime = dateTime;
+
         this.posts = posts;
     }
 }
