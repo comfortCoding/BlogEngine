@@ -1,7 +1,9 @@
 package main.services;
 
+import main.api.request.SettingsRequest;
 import main.api.response.*;
 import main.model.User;
+import main.model.enums.Settings;
 import main.repository.UserRepository;
 import main.util.*;
 import main.config.exception.ValidationException;
@@ -14,7 +16,6 @@ import main.model.answer.TagAnswer;
 import main.repository.GlobalSettingsRepository;
 import main.repository.PostRepository;
 import main.repository.TagRepository;
-import org.apache.tomcat.jni.Local;
 import org.mapstruct.factory.Mappers;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import static main.config.Config.TIME_ZONE;
+import static main.config.Config.NO;
+import static main.config.Config.YES;
 
 @Service
 public class GeneralService {
@@ -106,9 +108,9 @@ public class GeneralService {
 
         //сформируем ответ для фронта
         GlobalSettingsResponse globalSettingsResponse = new GlobalSettingsResponse();
-        globalSettingsResponse.setMultiuserMode(settings.get("MULTIUSER_MODE"));
-        globalSettingsResponse.setPostPremoderation(settings.get("POST_PREMODERATION"));
-        globalSettingsResponse.setStatisticsIsPublic(settings.get("STATISTICS_IS_PUBLIC"));
+        globalSettingsResponse.setMultiuserMode(settings.get(Settings.MULTIUSER_MODE.toString()));
+        globalSettingsResponse.setPostPremoderation(settings.get(Settings.POST_PREMODERATION.toString()));
+        globalSettingsResponse.setStatisticsIsPublic(settings.get(Settings.STATISTICS_IS_PUBLIC.toString()));
 
         return globalSettingsResponse;
     }
@@ -132,7 +134,7 @@ public class GeneralService {
         LocalDateTime localDateTime = postRepository.getFirstPublicationDate(LocalDateTime.now());
         ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
 
-        response.setFirstPublication(zdt.toInstant().toEpochMilli()/1000);
+        response.setFirstPublication(zdt.toInstant().toEpochMilli() / 1000);
 
         return response;
     }
@@ -156,8 +158,14 @@ public class GeneralService {
         LocalDateTime localDateTime = postRepository.getMyFirstPublicationDate(currentUserID, LocalDateTime.now());
         ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
 
-        response.setFirstPublication(zdt.toInstant().toEpochMilli()/1000);
+        response.setFirstPublication(zdt.toInstant().toEpochMilli() / 1000);
 
         return response;
+    }
+
+    public void setSettings(SettingsRequest request) {
+        settingsRepository.updateSetting(Settings.MULTIUSER_MODE.toString(), request.isMultiuserMode() ? YES : NO );
+        settingsRepository.updateSetting(Settings.POST_PREMODERATION.toString(), request.isPostPremoderation() ? YES : NO);
+        settingsRepository.updateSetting(Settings.STATISTICS_IS_PUBLIC.toString(), request.isStatisticsIsPublic() ? YES : NO);
     }
 }
