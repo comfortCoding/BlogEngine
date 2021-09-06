@@ -1,6 +1,6 @@
 package main.controller;
 
-import main.api.request.CommentRequest;
+import main.api.request.SettingsRequest;
 import main.api.response.*;
 import main.config.exception.ValidationException;
 import main.services.GeneralService;
@@ -56,5 +56,11 @@ public class ApiGeneralController {
     public ResponseEntity<StatisticsResponse> getMyStatistics() {
         StatisticsResponse response = generalService.getMyStatistics();
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping(value = "/settings")
+    public ResponseEntity<?> setSettings(@RequestBody SettingsRequest request){
+        generalService.setSettings(request);
+        return ResponseEntity.ok(null);
     }
 }

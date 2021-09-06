@@ -32,4 +32,8 @@ public class Config {
 
     public static final String NAME_REGEX = "[a-zA-Zа-яА-Я ]+";
     public static final String HTML_TAG_REGEX = "\\<.*?\\>";
+
+    public static final String YES = "YES";
+    public static final String NO = "NO";
+
 }
