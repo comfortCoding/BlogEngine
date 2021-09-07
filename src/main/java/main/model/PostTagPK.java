@@ -1,11 +1,13 @@
 package main.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Data
+@Getter
+@Setter
 @Embeddable
 public class PostTagPK implements Serializable {
 
@@ -17,22 +19,5 @@ public class PostTagPK implements Serializable {
     @JoinColumn(name = "tag_id", nullable = false, foreignKey = @ForeignKey(name = "FK_tag_id"))
     private Tag tag;
 
-    public PostTagPK(Post post, Tag tag){
-        this.post = post;
-        this.tag = tag;
-    }
-
-    public PostTagPK() {
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return (this == obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return this.hashCode();
-    }
 }
 
