@@ -1,10 +1,8 @@
 package main.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import main.model.enums.Role;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -22,8 +20,6 @@ public class User {
     @Column(name = "is_moderator", nullable = false)
     private boolean isModerator;
 
-    @DateTimeFormat(pattern = "yyyy.MM.dd HH-mm")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH-mm")
     @Column(name = "reg_time", nullable = false)
     private LocalDateTime regTime;
 

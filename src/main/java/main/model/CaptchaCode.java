@@ -1,14 +1,13 @@
 package main.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "captcha_codes")
 public class CaptchaCode {
@@ -17,8 +16,6 @@ public class CaptchaCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @DateTimeFormat(pattern = "yyyy.MM.dd HH-mm")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH-mm")
     @Column(name = "time", nullable = false)
     private LocalDateTime time;
 

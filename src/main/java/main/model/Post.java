@@ -1,12 +1,9 @@
 package main.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 import main.model.enums.ModerationStatus;
 import org.hibernate.annotations.Where;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -50,8 +47,6 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "FK_user_id"))
     private User user;
 
-    @DateTimeFormat(pattern = "yyyy.MM.dd HH-mm")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH-mm")
     @Column(name = "time", nullable = false)
     private LocalDateTime time;
 
@@ -64,16 +59,13 @@ public class Post {
     @Column(name = "view_count", nullable = false)
     private int viewCount;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostComment> postCommentList;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @Where(clause = "is_like = true")
     private List<PostVote> postLikeList;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     @Where(clause = "is_like = false")
     private List<PostVote> postDisLikeList;
