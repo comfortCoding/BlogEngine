@@ -11,6 +11,8 @@ import main.model.dto.RegistrationErrorsDTO;
 import main.repository.CaptchaRepository;
 import main.repository.PostRepository;
 import main.repository.UserRepository;
+import main.services.MailService.ApiEmailService;
+import main.util.GenerateHash;
 import main.util.UserToDTOCustomMapper;
 import org.mapstruct.factory.Mappers;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +38,7 @@ public class ApiAuthService {
     private final CaptchaRepository captchaRepository;
     private final PostRepository postRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ApiEmailService apiEmailService;
 
     private final UserToDTOCustomMapper userToDTOMapper;
 
@@ -43,12 +46,14 @@ public class ApiAuthService {
                           UserRepository userRepository,
                           CaptchaRepository captchaRepository,
                           PostRepository postRepository,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          ApiEmailService apiEmailService) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.captchaRepository = captchaRepository;
         this.postRepository = postRepository;
         this.passwordEncoder = passwordEncoder;
+        this.apiEmailService = apiEmailService;
 
         this.userToDTOMapper = Mappers.getMapper(UserToDTOCustomMapper.class);
     }
@@ -75,7 +80,6 @@ public class ApiAuthService {
 
         captchaRepository.deleteExpiredCaptcha(LocalDateTime.now(), CAPTCHA_EXPIRES_AFTER_HOURS);
 
-        //формируем ответ для фронта
         CaptchaResponse response = new CaptchaResponse();
 
         response.setImage("data:image/png;base64, " + Base64.getEncoder().encodeToString(image.draw(secretCode)));
@@ -134,15 +138,11 @@ public class ApiAuthService {
         return response;
     }
 
-    public LogoutResponse logoutUser() {
+    public ResultResponse logoutUser() {
 
         SecurityContextHolder.getContext().setAuthentication(null);
 
-        LogoutResponse response = new LogoutResponse();
-
-        response.setResult(true);
-
-        return response;
+        return new ResultResponse(true);
     }
 
 
@@ -159,6 +159,29 @@ public class ApiAuthService {
 
         return getLoginResponse(user.getUsername());
     }
+
+
+    public ResultResponse restorePassword(String email) {
+
+        User user = userRepository.findUserByEmail(email);
+
+        if (user == null) {
+            return new ResultResponse(false);
+        }
+
+        String hash = new GenerateHash().generateHash();
+
+        String messageBody = CHANGE_PASSWORD_TEXT + " <a href='" + SERVER + "/login/change-password/" + hash + "/'>" +
+                CHANGE_PASSWORD_LINK + "</a>.";
+
+        user.setCode(hash);
+        userRepository.save(user);
+
+        apiEmailService.sendMail(CHANGE_PASSWORD, messageBody, email);
+
+        return new ResultResponse(true);
+    }
+
 
     private LoginResponse getLoginResponse(String email) {
 

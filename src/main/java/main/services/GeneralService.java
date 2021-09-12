@@ -9,7 +9,6 @@ import main.util.*;
 import main.config.exception.ValidationException;
 import main.model.answer.CalendarAnswer;
 import main.model.dto.GlobalSettingDTO;
-import main.model.dto.InitDTO;
 import main.model.dto.TagDTO;
 import main.model.GlobalSetting;
 import main.model.answer.TagAnswer;
@@ -52,19 +51,7 @@ public class GeneralService {
     }
 
     public InitResponse getBlogConfig() {
-        InitDTO dto = new InitDTO();
-
-        //сформируем ответ для фронта
-        InitResponse response = new InitResponse();
-
-        response.setTitle(dto.getTitle());
-        response.setSubtitle(dto.getSubtitle());
-        response.setCopyright(dto.getCopyright());
-        response.setCopyrightFrom(dto.getCopyrightFrom());
-        response.setEmail(dto.getEmail());
-        response.setPhone(dto.getPhone());
-
-        return response;
+        return new InitResponse();
     }
 
     public TagsResponse getTags(String query) {
@@ -88,7 +75,6 @@ public class GeneralService {
 
         List<Byte> postYears = postRepository.getPostYears(LocalDateTime.now());
 
-        //сформируем ответ для фронта
         CalendarResponse response = new CalendarResponse();
         response.setYears(postYears);
         response.setPosts(Converter.convertCalendarListToMap(calendar));
@@ -106,7 +92,6 @@ public class GeneralService {
 
         HashMap<String, Boolean> settings = new HashMap<>(Converter.convertSettingsListToMap(globalSettingDTOs));
 
-        //сформируем ответ для фронта
         GlobalSettingsResponse globalSettingsResponse = new GlobalSettingsResponse();
         globalSettingsResponse.setMultiuserMode(settings.get(Settings.MULTIUSER_MODE.toString()));
         globalSettingsResponse.setPostPremoderation(settings.get(Settings.POST_PREMODERATION.toString()));
