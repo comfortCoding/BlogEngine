@@ -1,12 +1,11 @@
 package main.controller;
 
+import main.api.request.EmailRequest;
 import main.api.request.LoginRequest;
 import main.api.response.*;
 import main.api.request.RegisterRequest;
 import main.services.ApiAuthService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -46,8 +45,14 @@ public class ApiAuthController {
     }
 
     @GetMapping(value = "/logout")
-    public ResponseEntity<LogoutResponse> logoutUser(){
-        LogoutResponse response = apiAuthService.logoutUser();
+    public ResponseEntity<ResultResponse> logoutUser(){
+        ResultResponse response = apiAuthService.logoutUser();
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(value = "/restore")
+    public ResponseEntity<ResultResponse> restorePassword(@RequestBody EmailRequest request){
+        ResultResponse response = apiAuthService.restorePassword(request.getEmail());
         return ResponseEntity.ok(response);
     }
 }

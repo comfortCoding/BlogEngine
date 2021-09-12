@@ -32,8 +32,17 @@ public class Config {
 
     public static final String NAME_REGEX = "[a-zA-Zа-яА-Я ]+";
     public static final String HTML_TAG_REGEX = "\\<.*?\\>";
+    public static final String HASH_SOURCE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz";
 
     public static final String YES = "YES";
     public static final String NO = "NO";
+
+    public static final Integer HASH_LENGTH = 46;
+    public static final String CHANGE_PASSWORD = "Уведомление о смене пароля";
+    public static final String CHANGE_PASSWORD_TEXT = "Вам было направлено письмо о смене пароля. Если Вы не отправляли такого запроса, проигнорируйте это письмо. Иначе пройдите по ссылке:";
+    public static final String CHANGE_PASSWORD_LINK = "смена пароля";
+
+    public static final String SERVER = "http://localhost:8080";
+
 
 }
