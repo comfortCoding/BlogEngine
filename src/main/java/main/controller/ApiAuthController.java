@@ -2,6 +2,7 @@ package main.controller;
 
 import main.api.request.EmailRequest;
 import main.api.request.LoginRequest;
+import main.api.request.NewPasswordRequest;
 import main.api.response.*;
 import main.api.request.RegisterRequest;
 import main.services.ApiAuthService;
@@ -33,26 +34,32 @@ public class ApiAuthController {
     }
 
     @PostMapping(value = "/register")
-    public ResponseEntity<RegisterResponse> registerUser(@RequestBody RegisterRequest request){
-        RegisterResponse response = apiAuthService.registerUser(request);
+    public ResponseEntity<ResultResponse> registerUser(@RequestBody RegisterRequest request) {
+        ResultResponse response = apiAuthService.registerUser(request);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest request){
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest request) {
         LoginResponse response = apiAuthService.loginUser(request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/logout")
-    public ResponseEntity<ResultResponse> logoutUser(){
+    public ResponseEntity<ResultResponse> logoutUser() {
         ResultResponse response = apiAuthService.logoutUser();
         return ResponseEntity.ok(response);
     }
 
     @PostMapping(value = "/restore")
-    public ResponseEntity<ResultResponse> restorePassword(@RequestBody EmailRequest request){
+    public ResponseEntity<ResultResponse> restorePassword(@RequestBody EmailRequest request) {
         ResultResponse response = apiAuthService.restorePassword(request.getEmail());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(value = "/password")
+    public ResponseEntity<ResultResponse> saveNewPassword(@RequestBody NewPasswordRequest request) {
+        ResultResponse response = apiAuthService.saveNewPassword(request);
         return ResponseEntity.ok(response);
     }
 }

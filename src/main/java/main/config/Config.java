@@ -24,6 +24,7 @@ public class Config {
     public static final String NAME_ERROR = "Имя указано неверно";
     public static final String PASSWORD_ERROR = "Пароль короче 6-ти символов";
     public static final String CAPTCHA_ERROR = "Код с картинки введён неверно";
+    public static final String PASSWORD_LINK_EXPIRED_ERROR = "Ссылка для восстановления пароля устарела. <a href= \"/auth/restore\">Запросить ссылку снова</a>";
 
     public static final String POST_TITLE_SHORT_ERROR = "Слишком короткий заголовок";
     public static final String POST_BODY_SHORT_ERROR = "Слишком короткий пост";
@@ -43,6 +44,5 @@ public class Config {
     public static final String CHANGE_PASSWORD_LINK = "смена пароля";
 
     public static final String SERVER = "http://localhost:8080";
-
 
 }
