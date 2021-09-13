@@ -3,11 +3,12 @@ package main.services;
 import com.github.cage.Cage;
 import com.github.cage.GCage;
 import main.api.request.LoginRequest;
+import main.api.request.NewPasswordRequest;
 import main.api.response.*;
 import main.api.request.RegisterRequest;
 import main.model.CaptchaCode;
 import main.model.User;
-import main.model.dto.RegistrationErrorsDTO;
+import main.model.dto.ErrorsDTO;
 import main.repository.CaptchaRepository;
 import main.repository.PostRepository;
 import main.repository.UserRepository;
@@ -88,9 +89,7 @@ public class ApiAuthService {
         return response;
     }
 
-    public RegisterResponse registerUser(RegisterRequest request) {
-
-        boolean isCorrectResult = true;
+    public ResultResponse registerUser(RegisterRequest request) {
 
         String email = request.getEmail();
         String password = request.getPassword();
@@ -98,51 +97,50 @@ public class ApiAuthService {
         String captcha = request.getCaptcha();
         String captchaSecret = request.getCaptchaSecret();
 
-        RegistrationErrorsDTO errorsDTO = new RegistrationErrorsDTO();
+        ErrorsDTO errorsDTO = new ErrorsDTO();
 
         if (userRepository.isUserPresent(email) > 0) {
-            isCorrectResult = false;
+
             errorsDTO.setEmailError(EMAIL_ERROR);
+            return new ResultResponse(false, errorsDTO);
         }
 
         if (password.length() < MIN_PASSWORD_SIZE) {
-            isCorrectResult = false;
+
             errorsDTO.setPasswordError(PASSWORD_ERROR);
+            return new ResultResponse(false, errorsDTO);
         }
 
         if (!name.matches(NAME_REGEX)) {
-            isCorrectResult = false;
+
             errorsDTO.setNameError(NAME_ERROR);
+            return new ResultResponse(false, errorsDTO);
         }
 
         if (!captchaSecret.equals(captcha) ||
-                captchaRepository.checkCaptcha(captchaSecret) == 0) {
-            isCorrectResult = false;
+                captchaRepository.checkSecretCode(captchaSecret) == null) {
+
             errorsDTO.setCaptchaError(CAPTCHA_ERROR);
+
+            return new ResultResponse(false, errorsDTO);
         }
 
-        if (isCorrectResult) {
-            User newUser = new User();
-            newUser.setName(name);
-            newUser.setEmail(email);
-            newUser.setPassword(passwordEncoder.encode(password));
-            newUser.setRegTime(LocalDateTime.now());
+        User newUser = new User();
+        newUser.setName(name);
+        newUser.setEmail(email);
+        newUser.setPassword(passwordEncoder.encode(password));
+        newUser.setRegTime(LocalDateTime.now());
 
-            userRepository.save(newUser);
-        }
+        userRepository.save(newUser);
 
-        RegisterResponse response = new RegisterResponse();
-        response.setResult(isCorrectResult);
-        response.setErrors(errorsDTO);
-
-        return response;
+        return new ResultResponse(true, null);
     }
 
     public ResultResponse logoutUser() {
 
         SecurityContextHolder.getContext().setAuthentication(null);
 
-        return new ResultResponse(true);
+        return new ResultResponse(true, null);
     }
 
 
@@ -166,7 +164,7 @@ public class ApiAuthService {
         User user = userRepository.findUserByEmail(email);
 
         if (user == null) {
-            return new ResultResponse(false);
+            return new ResultResponse(false, null);
         }
 
         String hash = new GenerateHash().generateHash();
@@ -179,9 +177,38 @@ public class ApiAuthService {
 
         apiEmailService.sendMail(CHANGE_PASSWORD, messageBody, email);
 
-        return new ResultResponse(true);
+        return new ResultResponse(true, null);
     }
 
+    public ResultResponse saveNewPassword(NewPasswordRequest request) {
+
+        User user = userRepository.findUserByCode(request.getCode());
+
+        ErrorsDTO errorsDTO = new ErrorsDTO();
+        if (user == null) {
+
+            errorsDTO.setCodeError(PASSWORD_LINK_EXPIRED_ERROR);
+            return new ResultResponse(false, errorsDTO);
+        }
+
+        if (request.getPassword().length() < MIN_PASSWORD_SIZE) {
+
+            errorsDTO.setPasswordError(PASSWORD_ERROR);
+            return new ResultResponse(false, errorsDTO);
+        }
+
+        if (captchaRepository.checkCode(request.getCaptcha()) == null
+                && captchaRepository.checkSecretCode(request.getCaptchaSecret()) == null) {
+
+            errorsDTO.setCaptchaError(CAPTCHA_ERROR);
+            return new ResultResponse(false, errorsDTO);
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(user);
+
+        return new ResultResponse(true, null);
+    }
 
     private LoginResponse getLoginResponse(String email) {
 

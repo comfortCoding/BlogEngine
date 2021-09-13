@@ -13,10 +13,15 @@ import java.time.LocalDateTime;
 @Repository
 public interface CaptchaRepository extends JpaRepository<CaptchaCode, Integer> {
 
-    @Query("SELECT COUNT(cc.id) " +
+    @Query("SELECT cc.secretCode " +
             "FROM CaptchaCode cc " +
             "WHERE cc.secretCode = :secret ")
-    Byte checkCaptcha(@Param(value = "secret") String secret);
+    String checkSecretCode(@Param(value = "secret") String secret);
+
+    @Query("SELECT cc.code " +
+            "FROM CaptchaCode cc " +
+            "WHERE cc.code = :captcha ")
+    String checkCode(@Param(value = "captcha") String captcha);
 
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)

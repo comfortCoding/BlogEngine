@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegistrationErrorsDTO {
+public class ErrorsDTO {
 
     @JsonProperty(value = "email")
     private String emailError;
@@ -21,5 +21,8 @@ public class RegistrationErrorsDTO {
 
     @JsonProperty(value = "captcha")
     private String captchaError;
+
+    @JsonProperty(value = "code")
+    private String codeError;
 
 }

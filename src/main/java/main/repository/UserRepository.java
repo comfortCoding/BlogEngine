@@ -14,7 +14,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "WHERE u.email = :email ")
     Byte isUserPresent(@Param(value = "email") String email);
 
-
     @Query("SELECT u " +
             "FROM User u " +
             "WHERE u.email = :email ")
@@ -25,4 +24,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "WHERE u.email = :email AND u.isModerator = 1 ")
     User findModeratorByEmail(@Param(value = "email") String email);
 
+    @Query("SELECT u " +
+            "FROM User u " +
+            "WHERE u.code = :code ")
+    User findUserByCode(@Param(value = "code") String code);
 }
