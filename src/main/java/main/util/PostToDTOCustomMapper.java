@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper(uses = {DateToSecondMapper.class, TextToAnnounceMapper.class, CommentToDTOMapper.class})
+@Mapper(uses = {DateToSecondConverter.class, TextToAnnounceMapper.class, CommentToDTOMapper.class})
 public interface PostToDTOCustomMapper {
 
     default PostDTO convertToDTO(Post post) {
@@ -22,7 +22,7 @@ public interface PostToDTOCustomMapper {
 
         postDTO.setId(post.getId());
         postDTO.setActive(post.isActive());
-        postDTO.setTimestamp(new DateToSecondMapper().dateToSecond(post.getTime()));
+        postDTO.setTimestamp(new DateToSecondConverter().dateToSecond(post.getTime()));
         postDTO.setUser(Mappers.getMapper(UserToDTOCustomMapper.class).convertToDTO(post.getUser()));
         postDTO.setTitle(post.getTitle());
         postDTO.setAnnounce(new TextToAnnounceMapper().textToAnnounce(post.getText()));

@@ -25,11 +25,14 @@ public class Config {
     public static final String PASSWORD_ERROR = "Пароль короче 6-ти символов";
     public static final String CAPTCHA_ERROR = "Код с картинки введён неверно";
     public static final String PASSWORD_LINK_EXPIRED_ERROR = "Ссылка для восстановления пароля устарела. <a href= \"/auth/restore\">Запросить ссылку снова</a>";
+    public static final String IMAGE_SIZE_ERROR = "Размер файла превышает допустимый размер в 5 Мб";
 
     public static final String POST_TITLE_SHORT_ERROR = "Слишком короткий заголовок";
     public static final String POST_BODY_SHORT_ERROR = "Слишком короткий пост";
 
     public static final String COMMENT_BODY_SHORT_ERROR = "Текст комментария не задан или слишком короткий";
+
+    public static final String EXCEPTION_NOT_MODERATOR = "Текущему пользователю запрещены такие действия";
 
     public static final String NAME_REGEX = "[a-zA-Zа-яА-Я ]+";
     public static final String HTML_TAG_REGEX = "\\<.*?\\>";

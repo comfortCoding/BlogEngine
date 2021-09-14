@@ -1,8 +1,12 @@
 package main.services;
 
+import main.api.request.ProfileRequest;
 import main.api.request.SettingsRequest;
 import main.api.response.*;
+import main.config.Config;
+import main.config.exception.UnAuthorizedException;
 import main.model.User;
+import main.model.dto.ErrorsDTO;
 import main.model.enums.Settings;
 import main.repository.UserRepository;
 import main.util.*;
@@ -17,15 +21,13 @@ import main.repository.PostRepository;
 import main.repository.TagRepository;
 import org.mapstruct.factory.Mappers;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.*;
 
-import static main.config.Config.NO;
-import static main.config.Config.YES;
+import static main.config.Config.*;
 
 @Service
 public class GeneralService {
@@ -34,6 +36,8 @@ public class GeneralService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
 
+    private final PasswordEncoder passwordEncoder;
+
     private final SettingsToDTOMapper settingsToDTOMapper;
     private final TagToDTOCustomMapper tagToDTOCustomMapper;
 
@@ -41,11 +45,13 @@ public class GeneralService {
                           GlobalSettingsRepository settingsRepository,
                           PostRepository postRepository,
                           UserRepository userRepository,
+                          PasswordEncoder passwordEncoder,
                           SettingsToDTOMapper settingsToDTOMapper) {
         this.tagRepository = tagRepository;
         this.settingsRepository = settingsRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
         this.settingsToDTOMapper = settingsToDTOMapper;
         this.tagToDTOCustomMapper = Mappers.getMapper(TagToDTOCustomMapper.class);
     }
@@ -100,14 +106,13 @@ public class GeneralService {
         return globalSettingsResponse;
     }
 
-    public StatisticsResponse getAllStatistics() {
+    public StatisticsResponse getAllStatistics() throws UnAuthorizedException {
 
-        String currentUserEmail = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
+        User currentUser = getCurrentUser();
 
-        User currentUser = userRepository.findUserByEmail(currentUserEmail);
+        if (!currentUser.isModerator()) {
+            throw new UnAuthorizedException(Config.EXCEPTION_NOT_MODERATOR);
+        }
 
         StatisticsResponse response = new StatisticsResponse();
 
@@ -116,22 +121,17 @@ public class GeneralService {
         response.setLikesCount(postRepository.countLikes(LocalDateTime.now()));
         response.setDislikesCount(postRepository.countDislikes(LocalDateTime.now()));
 
-        LocalDateTime localDateTime = postRepository.getFirstPublicationDate(LocalDateTime.now());
-        ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
-
-        response.setFirstPublication(zdt.toInstant().toEpochMilli() / 1000);
+        LocalDateTime firstPublicationDate = postRepository.getFirstPublicationDate(LocalDateTime.now());
+        if (firstPublicationDate != null) {
+            response.setFirstPublication(new DateToSecondConverter().dateToSecond(firstPublicationDate));
+        }
 
         return response;
     }
 
     public StatisticsResponse getMyStatistics() {
 
-        String currentUserEmail = SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getName();
-
-        Integer currentUserID = userRepository.findUserByEmail(currentUserEmail).getId();
+        Integer currentUserID = getCurrentUser().getId();
 
         StatisticsResponse response = new StatisticsResponse();
 
@@ -140,17 +140,83 @@ public class GeneralService {
         response.setLikesCount(postRepository.countMyLikes(currentUserID, LocalDateTime.now()));
         response.setDislikesCount(postRepository.countMyDislikes(currentUserID, LocalDateTime.now()));
 
-        LocalDateTime localDateTime = postRepository.getMyFirstPublicationDate(currentUserID, LocalDateTime.now());
-        ZonedDateTime zdt = localDateTime.atZone(ZoneId.systemDefault());
-
-        response.setFirstPublication(zdt.toInstant().toEpochMilli() / 1000);
+        LocalDateTime firstPublicationDate = postRepository.getMyFirstPublicationDate(currentUserID, LocalDateTime.now());
+        if (firstPublicationDate != null) {
+            response.setFirstPublication(new DateToSecondConverter().dateToSecond(firstPublicationDate));
+        }
 
         return response;
     }
 
+    public ResultResponse saveImage() {
+
+        return new ResultResponse();
+    }
+
+    public ResultResponse editMyProfile(ProfileRequest request) {
+
+        String name = request.getName();
+        String email = request.getEmail();
+        User userInRequest = userRepository.findUserByEmail(email);
+        String password = request.getPassword();
+        String photo = String.valueOf(request.getPhoto());
+        boolean isRemovePhoto = request.getRemovePhoto() == 1;
+
+        User currentUser = getCurrentUser();
+
+        ErrorsDTO errorsDTO = new ErrorsDTO();
+
+        if (email != null && userInRequest != null && !userInRequest.getEmail().equals(currentUser.getEmail())) {
+            errorsDTO.setEmailError(EMAIL_ERROR);
+            return new ResultResponse(false, errorsDTO);
+        }
+
+        if (password != null && password.length() < MIN_PASSWORD_SIZE) {
+
+            errorsDTO.setPasswordError(PASSWORD_ERROR);
+            return new ResultResponse(false, errorsDTO);
+        }
+
+        if (name != null && !name.matches(NAME_REGEX)) {
+            errorsDTO.setNameError(NAME_ERROR);
+            return new ResultResponse(false, errorsDTO);
+        }
+
+        if (name != null) {
+            currentUser.setName(name);
+        }
+
+        if (email != null && userInRequest == null) {
+            currentUser.setEmail(email);
+        }
+
+        if (password != null) {
+            currentUser.setPassword(passwordEncoder.encode(password));
+        }
+
+        if (!isRemovePhoto && photo != null) {
+            currentUser.setPhoto(photo);
+        } else if (isRemovePhoto) {
+            currentUser.setPhoto("");
+        }
+
+        userRepository.save(currentUser);
+
+        return new ResultResponse(true, null);
+    }
+
     public void setSettings(SettingsRequest request) {
-        settingsRepository.updateSetting(Settings.MULTIUSER_MODE.toString(), request.isMultiuserMode() ? YES : NO );
+        settingsRepository.updateSetting(Settings.MULTIUSER_MODE.toString(), request.isMultiuserMode() ? YES : NO);
         settingsRepository.updateSetting(Settings.POST_PREMODERATION.toString(), request.isPostPremoderation() ? YES : NO);
         settingsRepository.updateSetting(Settings.STATISTICS_IS_PUBLIC.toString(), request.isStatisticsIsPublic() ? YES : NO);
+    }
+
+    private User getCurrentUser() {
+        String currentUserEmail = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return userRepository.findUserByEmail(currentUserEmail);
     }
 }
