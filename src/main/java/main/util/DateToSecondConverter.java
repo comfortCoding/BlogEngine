@@ -8,9 +8,9 @@ import java.time.ZoneId;
 import static main.config.Config.TIME_ZONE;
 
 @Component
-public class DateToSecondMapper {
+public class DateToSecondConverter {
 
-    Long dateToSecond(LocalDateTime date) {
+    public Long dateToSecond(LocalDateTime date) {
 
         return date.atZone(ZoneId.of(TIME_ZONE)).toEpochSecond();
     }

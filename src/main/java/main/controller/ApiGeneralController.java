@@ -1,7 +1,9 @@
 package main.controller;
 
+import main.api.request.ProfileRequest;
 import main.api.request.SettingsRequest;
 import main.api.response.*;
+import main.config.exception.UnAuthorizedException;
 import main.config.exception.ValidationException;
 import main.services.GeneralService;
 import org.springframework.http.ResponseEntity;
@@ -41,13 +43,20 @@ public class ApiGeneralController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(value = "/profile/my")
-    public ResponseEntity<?> getMyProfile() {
-        return ResponseEntity.ok(null);
+    @PostMapping(value = "/profile/my")
+    public ResponseEntity<ResultResponse> editMyProfile(@RequestBody ProfileRequest request) {
+        ResultResponse response = generalService.editMyProfile(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(value = "/image")
+    public ResponseEntity<ResultResponse> saveImage() {
+        ResultResponse response = generalService.saveImage();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = "/statistics/all")
-    public ResponseEntity<StatisticsResponse> getAllStatistics() {
+    public ResponseEntity<StatisticsResponse> getAllStatistics() throws UnAuthorizedException {
         StatisticsResponse response = generalService.getAllStatistics();
         return ResponseEntity.ok(response);
     }
@@ -59,7 +68,7 @@ public class ApiGeneralController {
     }
 
     @PutMapping(value = "/settings")
-    public ResponseEntity<?> setSettings(@RequestBody SettingsRequest request){
+    public ResponseEntity<?> setSettings(@RequestBody SettingsRequest request) {
         generalService.setSettings(request);
         return ResponseEntity.ok(null);
     }

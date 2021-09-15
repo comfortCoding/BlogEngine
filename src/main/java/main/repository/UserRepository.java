@@ -9,11 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    @Query("SELECT COUNT(u.id) " +
-            "FROM User u " +
-            "WHERE u.email = :email ")
-    Byte isUserPresent(@Param(value = "email") String email);
-
     @Query("SELECT u " +
             "FROM User u " +
             "WHERE u.email = :email ")
@@ -28,4 +23,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             "FROM User u " +
             "WHERE u.code = :code ")
     User findUserByCode(@Param(value = "code") String code);
+
 }

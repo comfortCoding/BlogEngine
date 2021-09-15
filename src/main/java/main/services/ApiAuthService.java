@@ -99,8 +99,7 @@ public class ApiAuthService {
 
         ErrorsDTO errorsDTO = new ErrorsDTO();
 
-        if (userRepository.isUserPresent(email) > 0) {
-
+        if (userRepository.findUserByEmail(email) != null) {
             errorsDTO.setEmailError(EMAIL_ERROR);
             return new ResultResponse(false, errorsDTO);
         }

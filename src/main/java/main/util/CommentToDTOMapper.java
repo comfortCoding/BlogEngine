@@ -8,7 +8,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mapper(uses = {DateToSecondMapper.class})
+@Mapper(uses = {DateToSecondConverter.class})
 public interface CommentToDTOMapper {
 
     default PostCommentDTO convertToDTO(PostComment comment) {
@@ -18,7 +18,7 @@ public interface CommentToDTOMapper {
         commentDTO.setText(comment.getText());
         commentDTO.setId(comment.getId());
         commentDTO.setPostID(comment.getPost().getId());
-        commentDTO.setTime(new DateToSecondMapper().dateToSecond(comment.getTime()));
+        commentDTO.setTime(new DateToSecondConverter().dateToSecond(comment.getTime()));
         commentDTO.setUser(Mappers.getMapper(UserToDTOCustomMapper.class).convertToDTO(comment.getUser()));
 
         return commentDTO;
