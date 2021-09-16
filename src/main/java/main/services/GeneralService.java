@@ -20,6 +20,9 @@ import main.repository.GlobalSettingsRepository;
 import main.repository.PostRepository;
 import main.repository.TagRepository;
 import org.mapstruct.factory.Mappers;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,6 +38,7 @@ public class GeneralService {
     private final GlobalSettingsRepository settingsRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -45,12 +49,13 @@ public class GeneralService {
                           GlobalSettingsRepository settingsRepository,
                           PostRepository postRepository,
                           UserRepository userRepository,
-                          PasswordEncoder passwordEncoder,
+                          AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder,
                           SettingsToDTOMapper settingsToDTOMapper) {
         this.tagRepository = tagRepository;
         this.settingsRepository = settingsRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
+        this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.settingsToDTOMapper = settingsToDTOMapper;
         this.tagToDTOCustomMapper = Mappers.getMapper(TagToDTOCustomMapper.class);
@@ -188,6 +193,13 @@ public class GeneralService {
 
         if (email != null && userInRequest == null) {
             currentUser.setEmail(email);
+
+            Authentication authentication
+                    = new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword());
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         if (password != null) {
