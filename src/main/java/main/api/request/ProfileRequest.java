@@ -1,10 +1,8 @@
 package main.api.request;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.Base64;
 
 @Data
 public class ProfileRequest {
@@ -22,6 +20,6 @@ public class ProfileRequest {
     private Integer removePhoto = 0;
 
     @JsonProperty(value = "photo")
-    private Base64 photo;
+    private String photo;
 
 }

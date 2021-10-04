@@ -19,26 +19,37 @@ import main.model.answer.TagAnswer;
 import main.repository.GlobalSettingsRepository;
 import main.repository.PostRepository;
 import main.repository.TagRepository;
+import org.apache.commons.io.FileUtils;
 import org.mapstruct.factory.Mappers;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import static main.config.Config.*;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+
 @Service
 public class GeneralService {
+
+    @Value("${javapro.storagepath}")
+    private String uploadPath;
+
     private final TagRepository tagRepository;
     private final GlobalSettingsRepository settingsRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final AuthenticationManager authenticationManager;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -49,13 +60,12 @@ public class GeneralService {
                           GlobalSettingsRepository settingsRepository,
                           PostRepository postRepository,
                           UserRepository userRepository,
-                          AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder,
+                          PasswordEncoder passwordEncoder,
                           SettingsToDTOMapper settingsToDTOMapper) {
         this.tagRepository = tagRepository;
         this.settingsRepository = settingsRepository;
         this.postRepository = postRepository;
         this.userRepository = userRepository;
-        this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.settingsToDTOMapper = settingsToDTOMapper;
         this.tagToDTOCustomMapper = Mappers.getMapper(TagToDTOCustomMapper.class);
@@ -153,13 +163,31 @@ public class GeneralService {
         return response;
     }
 
-    public ResultResponse saveImage() {
+    public ResultResponse editProfile(String email, Integer removePhoto, MultipartFile file, String name, String password) throws IOException {
+        //TODO edit profile icon
+        User userInRequest = userRepository.findUserByEmail(email);
 
-        return new ResultResponse();
+        String fileExtension = "";
+        String multipartFileName = file.getOriginalFilename();
+
+        if (multipartFileName != null) {
+            fileExtension = multipartFileName.substring(multipartFileName.lastIndexOf('.') + 1);
+        }
+
+        String fullFileName = STORAGE + genName() + "." + fileExtension;
+
+        String full = uploadPath + fullFileName;
+
+        file.transferTo(Paths.get(full));
+
+        userInRequest.setPhoto(fullFileName);
+        userRepository.save(userInRequest);
+
+        return new ResultResponse(true, null);
     }
 
-    public ResultResponse editMyProfile(ProfileRequest request) {
-
+    public ResultResponse editProfile(ProfileRequest request) {
+        //TODO edit profile icon
         String name = request.getName();
         String email = request.getEmail();
         User userInRequest = userRepository.findUserByEmail(email);
@@ -196,8 +224,8 @@ public class GeneralService {
 
             Authentication authentication
                     = new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword());
+                    request.getEmail(),
+                    request.getPassword());
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
@@ -206,15 +234,21 @@ public class GeneralService {
             currentUser.setPassword(passwordEncoder.encode(password));
         }
 
-        if (!isRemovePhoto && photo != null) {
-            currentUser.setPhoto(photo);
-        } else if (isRemovePhoto) {
+        if (isRemovePhoto) {
             currentUser.setPhoto("");
+        } else if (photo != null) {
+            currentUser.setPhoto(photo);
         }
 
         userRepository.save(currentUser);
 
         return new ResultResponse(true, null);
+    }
+
+    public ResultResponse loadImage(MultipartFile file){
+        //TODO load image for post
+
+        return new ResultResponse();
     }
 
     public void setSettings(SettingsRequest request) {
@@ -230,5 +264,14 @@ public class GeneralService {
                 .getName();
 
         return userRepository.findUserByEmail(currentUserEmail);
+    }
+
+    private String genName() {
+        String alfabet = "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < 20; i++) {
+            stringBuilder.append(alfabet.charAt(new Random().nextInt(alfabet.length() - 1)));
+        }
+        return stringBuilder.toString();
     }
 }
