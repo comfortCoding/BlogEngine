@@ -15,6 +15,7 @@ import main.model.dto.ErrorsDTO;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResultResponse {
 
+
     @JsonProperty(value = "result")
     private boolean result;
 

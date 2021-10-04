@@ -47,5 +47,6 @@ public class Config {
     public static final String CHANGE_PASSWORD_LINK = "смена пароля";
 
     public static final String SERVER = "http://localhost:8080";
+    public static final String STORAGE = "/upload/";
 
 }

@@ -8,6 +8,9 @@ import main.config.exception.ValidationException;
 import main.services.GeneralService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api")
@@ -44,16 +47,27 @@ public class ApiGeneralController {
     }
 
     @PostMapping(value = "/profile/my")
-    public ResponseEntity<ResultResponse> editMyProfile(@RequestBody ProfileRequest request) {
-        ResultResponse response = generalService.editMyProfile(request);
+    public ResponseEntity<ResultResponse> editProfile(@RequestBody ProfileRequest request) {
+        ResultResponse response = generalService.editProfile(request);
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(value = "/image")
-    public ResponseEntity<ResultResponse> saveImage() {
-        ResultResponse response = generalService.saveImage();
+    @PostMapping(value = "/profile/my", consumes = "multipart/form-data")
+    public ResponseEntity<ResultResponse> editProfile(@RequestParam(value = "email") String email,
+                                                      @RequestParam(value = "removePhoto") Integer removePhoto,
+                                                      @RequestParam(value = "photo") MultipartFile file,
+                                                      @RequestParam(value = "name") String name,
+                                                      @RequestParam(value = "password", required = false) String password) throws IOException {
+        ResultResponse response = generalService.editProfile(email, removePhoto, file, name, password);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping(value = "/image", consumes = "multipart/form-data")
+    public ResponseEntity<ResultResponse> loadImage(@RequestParam MultipartFile file){
+        ResultResponse response = generalService.loadImage(file);
+        return ResponseEntity.ok(response);
+    }
+
 
     @GetMapping(value = "/statistics/all")
     public ResponseEntity<StatisticsResponse> getAllStatistics() throws UnAuthorizedException {
@@ -68,8 +82,7 @@ public class ApiGeneralController {
     }
 
     @PutMapping(value = "/settings")
-    public ResponseEntity<?> setSettings(@RequestBody SettingsRequest request) {
+    public void setSettings(@RequestBody SettingsRequest request) {
         generalService.setSettings(request);
-        return ResponseEntity.ok(null);
     }
 }
