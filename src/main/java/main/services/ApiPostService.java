@@ -7,7 +7,7 @@ import main.api.response.*;
 import main.model.PostVote;
 import main.model.Tag;
 import main.model.User;
-import main.model.dto.PostErrorDTO;
+import main.api.dto.PostErrorDTO;
 import main.model.enums.ModeratePostStatus;
 import main.model.enums.ModerationStatus;
 import main.model.enums.PostStatus;
@@ -15,7 +15,7 @@ import main.repository.PostVoteRepository;
 import main.repository.UserRepository;
 import main.util.PostToDTOCustomMapper;
 import main.config.exception.NotFoundException;
-import main.model.dto.PostDTO;
+import main.api.dto.PostDTO;
 import main.model.Post;
 import main.model.enums.OutputMode;
 import main.repository.PostRepository;
@@ -68,11 +68,9 @@ public class ApiPostService {
 
         List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
 
-        PostsResponse response = new PostsResponse();
-        response.setCount(countAllPosts);
-        response.setPosts(postDTOs);
-
-        return response;
+        return PostsResponse.create()
+                .setCount(countAllPosts)
+                .setPosts(postDTOs);
     }
 
     public PostsResponse searchByDate(Integer offset,
@@ -89,12 +87,9 @@ public class ApiPostService {
 
         List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
 
-        PostsResponse response = new PostsResponse();
-
-        response.setCount(countAllPosts);
-        response.setPosts(postDTOs);
-
-        return response;
+        return PostsResponse.create()
+                .setCount(countAllPosts)
+                .setPosts(postDTOs);
     }
 
     public PostsResponse searchByTag(Integer offset,
@@ -108,12 +103,9 @@ public class ApiPostService {
 
         List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
 
-        PostsResponse response = new PostsResponse();
-
-        response.setCount(countAllPosts);
-        response.setPosts(postDTOs);
-
-        return response;
+        return PostsResponse.create()
+                .setCount(countAllPosts)
+                .setPosts(postDTOs);
     }
 
     public PostsResponse getPosts(Integer offset,
@@ -141,11 +133,9 @@ public class ApiPostService {
 
         List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
 
-        PostsResponse response = new PostsResponse();
-        response.setCount(countAllPosts);
-        response.setPosts(postDTOs);
-
-        return response;
+        return PostsResponse.create()
+                .setCount(countAllPosts)
+                .setPosts(postDTOs);
     }
 
     public PostDataResponse addPost(PostDataRequest request) {
@@ -214,11 +204,9 @@ public class ApiPostService {
         Long countAllPosts = Objects.requireNonNull(postsPageable).getTotalElements();
         List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
 
-        PostsResponse response = new PostsResponse();
-        response.setCount(countAllPosts);
-        response.setPosts(postDTOs);
-
-        return response;
+        return PostsResponse.create()
+                .setCount(countAllPosts)
+                .setPosts(postDTOs);
     }
 
     public PostsResponse getPostsForModeration(Integer offset,
@@ -246,11 +234,9 @@ public class ApiPostService {
         Long countAllPosts = Objects.requireNonNull(postsPageable).getTotalElements();
         List<PostDTO> postDTOs = postToDTOCustomMapper.convertToDTO(postsPageable);
 
-        PostsResponse response = new PostsResponse();
-        response.setCount(countAllPosts);
-        response.setPosts(postDTOs);
-
-        return response;
+        return PostsResponse.create()
+                .setCount(countAllPosts)
+                .setPosts(postDTOs);
     }
 
     public ModerateResponse moderatePost(ModerateRequest request) {
@@ -292,7 +278,7 @@ public class ApiPostService {
 
         List<String> tags = tagRepository.getTagNamesByPostID(postID);
 
-        PostResponse response = new PostResponse();
+        PostResponse response = PostResponse.create();
 
         response.setId(postDTO.getId());
         response.setTimestamp(postDTO.getTimestamp());

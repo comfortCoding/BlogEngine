@@ -2,13 +2,10 @@ package main.services;
 
 import main.api.request.CommentRequest;
 import main.api.response.CommentResponse;
-import main.api.response.PostDataResponse;
 import main.model.Post;
 import main.model.PostComment;
 import main.model.User;
-import main.model.dto.CommentErrorDTO;
-import main.model.dto.PostCommentDTO;
-import main.model.dto.PostErrorDTO;
+import main.api.dto.CommentErrorDTO;
 import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
 import main.repository.UserRepository;

@@ -1,7 +1,7 @@
 package main.util;
 
 import main.model.PostComment;
-import main.model.dto.PostCommentDTO;
+import main.api.dto.PostCommentDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

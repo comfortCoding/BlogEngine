@@ -2,7 +2,7 @@ package main.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import main.model.dto.CommentErrorDTO;
+import main.api.dto.CommentErrorDTO;
 
 import java.util.List;
 

@@ -24,4 +24,8 @@ public class GlobalSetting {
 
     @Column(name = "value", nullable = false)
     private String value;
+
+    public boolean getValue() {
+        return this.value.equalsIgnoreCase("YES");
+    }
 }
