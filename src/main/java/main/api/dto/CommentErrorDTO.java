@@ -1,4 +1,4 @@
-package main.model.dto;
+package main.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -8,11 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TagDTO {
+public class CommentErrorDTO {
 
-    @JsonProperty(value = "name")
-    private String name;
+    @JsonProperty(value = "text")
+    private String text;
 
-    @JsonProperty(value = "weight")
-    private Double weight;
 }

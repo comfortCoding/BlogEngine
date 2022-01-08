@@ -1,7 +1,7 @@
 package main.util;
 
 import main.model.User;
-import main.model.dto.UserDTO;
+import main.api.dto.UserDTO;
 import org.mapstruct.*;
 
 @Mapper

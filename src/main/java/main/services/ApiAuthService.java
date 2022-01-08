@@ -8,7 +8,7 @@ import main.api.response.*;
 import main.api.request.RegisterRequest;
 import main.model.CaptchaCode;
 import main.model.User;
-import main.model.dto.ErrorsDTO;
+import main.api.dto.ErrorsDTO;
 import main.repository.CaptchaRepository;
 import main.repository.PostRepository;
 import main.repository.UserRepository;

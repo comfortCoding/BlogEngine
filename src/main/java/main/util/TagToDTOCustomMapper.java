@@ -1,6 +1,6 @@
 package main.util;
 
-import main.model.dto.TagDTO;
+import main.api.dto.TagDTO;
 import main.model.answer.TagAnswer;
 import org.mapstruct.Mapper;
 

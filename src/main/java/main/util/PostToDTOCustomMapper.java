@@ -1,6 +1,6 @@
 package main.util;
 
-import main.model.dto.PostDTO;
+import main.api.dto.PostDTO;
 import main.model.Post;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
